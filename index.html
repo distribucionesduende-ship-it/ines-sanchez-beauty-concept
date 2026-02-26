@@ -342,28 +342,72 @@ document.getElementById('btnAddInv').addEventListener('click', addInv);
 function addInv(){
   var id = ++EST.nc;
   EST.invs.push({id:id, nom:'', srvSel:new Set()});
+
   var row = document.createElement('div');
   row.className = 'inv-row';
   row.id = 'invRow'+id;
-  var checkboxesHTML = CFG.serviciosInv.map(function(s,i){
-    return '<label class="inv-srv-check"><input type="checkbox" data-idx="'+i+'"> '+s.nom+' <span class="inv-pre">'+s.pre+'€</span></label>';
-  }).join('');
-  row.innerHTML = '<div class="campo"><label>Nombre / Relaci&oacute;n</label><input type="text" placeholder="Madre, hermana..."></div>'
-    +'<div class="campo inv-servicios-wrap"><label>Servicios</label><div class="inv-srv-list">'+checkboxesHTML+'</div></div>'
-    +'<button class="btn-rm">&#10005; Quitar</button>';
-  var inp = row.querySelector('input[type=text]');
-  var btn = row.querySelector('.btn-rm');
-  inp.addEventListener('input', function(){var inv=EST.invs.find(function(x){return x.id===id;});if(inv)inv.nom=inp.value;});
-  row.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+
+  // Columna 1: nombre
+  var col1 = document.createElement('div');
+  col1.className = 'campo';
+  var lbl1 = document.createElement('label');
+  lbl1.textContent = 'Nombre / Relación';
+  var inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'Madre, hermana...';
+  inp.addEventListener('input', function(){
+    var inv=EST.invs.find(function(x){return x.id===id;});
+    if(inv) inv.nom = inp.value;
+  });
+  col1.appendChild(lbl1);
+  col1.appendChild(inp);
+
+  // Columna 2: servicios
+  var col2 = document.createElement('div');
+  col2.className = 'campo';
+  var lbl2 = document.createElement('label');
+  lbl2.textContent = 'Servicios';
+  var lista = document.createElement('div');
+  lista.className = 'inv-srv-list';
+
+  CFG.serviciosInv.forEach(function(s, i){
+    var lbl = document.createElement('label');
+    lbl.className = 'inv-srv-check';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
     cb.addEventListener('change', function(){
-      var inv=EST.invs.find(function(x){return x.id===id;});
-      if(!inv)return;
-      var idx=parseInt(cb.dataset.idx);
-      if(cb.checked)inv.srvSel.add(idx);else inv.srvSel.delete(idx);
+      var inv = EST.invs.find(function(x){return x.id===id;});
+      if(!inv) return;
+      if(cb.checked) inv.srvSel.add(i); else inv.srvSel.delete(i);
       actualizarResumen();
     });
+    var txt = document.createTextNode(' ' + s.nom + ' ');
+    var pre = document.createElement('span');
+    pre.className = 'inv-pre';
+    pre.textContent = s.pre + '€';
+    lbl.appendChild(cb);
+    lbl.appendChild(txt);
+    lbl.appendChild(pre);
+    lista.appendChild(lbl);
   });
-  btn.addEventListener('click', function(){EST.invs=EST.invs.filter(function(x){return x.id!==id;});row.remove();actualizarBonif();actualizarResumen();});
+
+  col2.appendChild(lbl2);
+  col2.appendChild(lista);
+
+  // Columna 3: botón quitar
+  var btn = document.createElement('button');
+  btn.className = 'btn-rm';
+  btn.textContent = '✕ Quitar';
+  btn.addEventListener('click', function(){
+    EST.invs = EST.invs.filter(function(x){return x.id!==id;});
+    row.remove();
+    actualizarBonif();
+    actualizarResumen();
+  });
+
+  row.appendChild(col1);
+  row.appendChild(col2);
+  row.appendChild(btn);
   document.getElementById('listaInv').appendChild(row);
   actualizarBonif();
   actualizarResumen();
