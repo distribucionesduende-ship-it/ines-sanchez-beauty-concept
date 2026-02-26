@@ -30,11 +30,12 @@ body{font-family:'Jost',sans-serif;background:var(--crema);color:var(--negro);}
 .campo textarea{resize:vertical;min-height:72px;}
 /* SERVICIOS */
 .srv-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.srv-card{border:1.5px solid var(--borde);background:#fff;border-radius:6px;padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:11px;transition:border-color .15s,background .15s;-webkit-user-select:none;user-select:none;}
-.srv-card:hover{border-color:var(--dorado);}
-.srv-card.on{border-color:var(--dorado);background:rgba(184,151,42,.07);}
-.srv-chk{width:19px;height:19px;border:1.5px solid var(--borde);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;}
-.srv-card.on .srv-chk{background:var(--dorado);border-color:var(--dorado);color:#fff;}
+.srv-card{display:none;}
+.srv-label{border:1.5px solid var(--borde);background:#fff;border-radius:6px;padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:11px;transition:border-color .15s,background .15s;-webkit-user-select:none;user-select:none;}
+.srv-label:hover{border-color:var(--dorado);}
+.srv-chk{width:19px;height:19px;border:1.5px solid var(--borde);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;background:#fff;}
+.srv-card:checked + .srv-label{border-color:var(--dorado);background:rgba(184,151,42,.07);}
+.srv-card:checked + .srv-label .srv-chk{background:var(--dorado);border-color:var(--dorado);color:#fff;}
 .srv-nom{font-size:.86rem;font-weight:500;}
 .srv-pre{font-family:'Cormorant Garamond',serif;font-size:.98rem;color:var(--dorado);font-weight:500;}
 /* INVITADAS */
@@ -291,22 +292,20 @@ function initNovia(){
   var g = document.getElementById('gridNovia');
   g.innerHTML = '';
   CFG.serviciosNovia.forEach(function(s,i){
-    var d = document.createElement('div');
-    d.className = 'srv-card';
-    d.setAttribute('data-idx', String(i));
-    d.innerHTML = '<div class="srv-chk">&#10003;</div><div class="srv-info"><div class="srv-nom">'+s.nom+'</div><div class="srv-pre">'+s.pre+' &euro;</div></div>';
-    g.appendChild(d);
-  });
-  g.addEventListener('click', function(e){
-    var t = e.target;
-    var card = null;
-    while(t && t !== g){ if(t.classList && t.classList.contains('srv-card')){card=t;break;} t=t.parentNode; }
-    if(!card) return;
-    var idx = parseInt(card.getAttribute('data-idx'));
-    if(isNaN(idx)) return;
-    if(EST.sel.has(idx)){EST.sel.delete(idx);card.classList.remove('on');}
-    else{EST.sel.add(idx);card.classList.add('on');}
-    actualizarResumen();
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'srv-card';
+    cb.id = 'srv'+i;
+    cb.addEventListener('change', function(){
+      if(this.checked) EST.sel.add(i); else EST.sel.delete(i);
+      actualizarResumen();
+    });
+    var lbl = document.createElement('label');
+    lbl.className = 'srv-label';
+    lbl.setAttribute('for', 'srv'+i);
+    lbl.innerHTML = '<div class="srv-chk">&#10003;</div><div class="srv-info"><div class="srv-nom">'+s.nom+'</div><div class="srv-pre">'+s.pre+' &euro;</div></div>';
+    g.appendChild(cb);
+    g.appendChild(lbl);
   });
 }
 
