@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inés Sánchez Beauty Concept — Contrato de Boda</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+:root{--negro:#1a1410;--dorado:#b8972a;--dorado-claro:#d4af37;--crema:#faf7f2;--crema-o:#f0ebe1;--gris:#7a6f65;--borde:#ddd5c8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Jost',sans-serif;background:var(--crema);color:var(--negro);}
+.hero{background:var(--negro);padding:52px 40px 44px;text-align:center;}
+.hero img{max-width:260px;height:auto;}
+.hero-tag{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;letter-spacing:.3em;color:var(--dorado-claro);margin-top:20px;text-transform:uppercase;}
+.hero-sub{font-size:.75rem;color:rgba(255,255,255,.4);letter-spacing:.15em;margin-top:8px;text-transform:uppercase;}
+.intro{background:var(--crema-o);border-bottom:1px solid var(--borde);padding:28px 40px;text-align:center;}
+.intro p{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gris);max-width:660px;margin:0 auto;line-height:1.7;}
+.container{max-width:840px;margin:0 auto;padding:44px 24px 80px;}
+.sec{margin-bottom:42px;}
+.sec-hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--borde);}
+.sec-num{width:26px;height:26px;background:var(--dorado);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:500;flex-shrink:0;}
+.sec-tit{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;letter-spacing:.04em;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.cf{grid-column:1/-1;}
+.campo{display:flex;flex-direction:column;gap:5px;}
+.campo label{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);}
+.campo input,.campo select,.campo textarea{border:1px solid var(--borde);background:#fff;padding:10px 13px;font-family:'Jost',sans-serif;font-size:.9rem;color:var(--negro);border-radius:4px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none;}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--dorado);box-shadow:0 0 0 3px rgba(184,151,42,.1);}
+.campo textarea{resize:vertical;min-height:72px;}
+/* SERVICIOS */
+.srv-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.srv-card{border:1.5px solid var(--borde);background:#fff;border-radius:6px;padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:11px;transition:border-color .15s,background .15s;-webkit-user-select:none;user-select:none;}
+.srv-card:hover{border-color:var(--dorado);}
+.srv-card.on{border-color:var(--dorado);background:rgba(184,151,42,.07);}
+.srv-chk{width:19px;height:19px;border:1.5px solid var(--borde);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s;}
+.srv-card.on .srv-chk{background:var(--dorado);border-color:var(--dorado);color:#fff;}
+.srv-nom{font-size:.86rem;font-weight:500;}
+.srv-pre{font-family:'Cormorant Garamond',serif;font-size:.98rem;color:var(--dorado);font-weight:500;}
+/* INVITADAS */
+.inv-nota{background:rgba(184,151,42,.07);border:1px solid rgba(184,151,42,.25);border-radius:6px;padding:13px 17px;margin-bottom:18px;font-size:.84rem;color:var(--gris);line-height:1.6;}
+.inv-nota strong{color:var(--negro);}
+.inv-row{display:grid;grid-template-columns:1fr 2fr auto;gap:9px;align-items:start;margin-bottom:9px;padding:11px 13px;background:#fff;border:1px solid var(--borde);border-radius:6px;}
+.inv-srv-list{display:flex;flex-direction:column;gap:5px;margin-top:2px;}
+.inv-srv-check{display:flex;align-items:center;gap:7px;font-size:.82rem;cursor:pointer;-webkit-user-select:none;user-select:none;}
+.inv-srv-check input{width:15px;height:15px;accent-color:var(--dorado);cursor:pointer;flex-shrink:0;}
+.inv-pre{color:var(--dorado);font-family:'Cormorant Garamond',serif;font-size:.92rem;margin-left:2px;}
+.btn-add{background:transparent;border:1.5px dashed var(--dorado);color:var(--dorado);padding:10px;width:100%;margin-top:7px;border-radius:4px;font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:background .2s;}
+.btn-add:hover{background:rgba(184,151,42,.06);}
+.btn-rm{background:#fdf0f0;color:#c0392b;border:1px solid #f0d0d0;padding:0 12px;height:40px;border-radius:4px;cursor:pointer;font-size:.82rem;font-family:'Jost',sans-serif;white-space:nowrap;transition:background .2s;}
+.btn-rm:hover{background:#f8d8d8;}
+/* BEAUTY CORNER */
+.bc-box{margin-top:18px;border:1.5px solid var(--borde);border-radius:6px;padding:16px;background:#fff;}
+.bc-row{display:flex;align-items:center;gap:13px;cursor:pointer;}
+.sw{position:relative;width:42px;height:22px;flex-shrink:0;}
+.sw input{display:none;}
+.sw-sl{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--borde);border-radius:22px;cursor:pointer;transition:.25s;}
+.sw-sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.sw input:checked+.sw-sl{background:var(--dorado);}
+.sw input:checked+.sw-sl::before{transform:translateX(20px);}
+.bc-det{margin-top:14px;display:none;}
+.bc-det.vis{display:block;}
+/* ZONAS */
+.zona-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.zona-card{border:1.5px solid var(--borde);background:#fff;border-radius:6px;padding:13px 10px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s;-webkit-user-select:none;user-select:none;}
+.zona-card:hover{border-color:var(--dorado);}
+.zona-card.on{border-color:var(--dorado);background:rgba(184,151,42,.07);}
+.zona-et{font-size:.67rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--gris);}
+.zona-nm{font-size:.8rem;font-weight:500;margin:4px 0 3px;line-height:1.3;}
+.zona-pr{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--dorado);font-weight:500;}
+.bonif-info{margin-top:11px;padding:10px 13px;background:rgba(184,151,42,.07);border-radius:4px;font-size:.8rem;color:var(--gris);line-height:1.5;}
+/* RESUMEN */
+.res-box{background:var(--negro);color:#fff;border-radius:8px;padding:26px 30px;}
+.res-tit{font-family:'Cormorant Garamond',serif;font-size:1rem;letter-spacing:.12em;color:var(--dorado-claro);margin-bottom:16px;text-transform:uppercase;}
+.res-ln{display:flex;justify-content:space-between;padding:6px 0;font-size:.86rem;border-bottom:1px solid rgba(255,255,255,.07);}
+.res-ln.tot{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--dorado-claro);margin-top:7px;padding-top:12px;border-top:1px solid rgba(184,151,42,.35);border-bottom:none;}
+.res-ln.dep{font-size:.79rem;color:rgba(255,255,255,.5);border-bottom:none;}
+.res-vacio{font-size:.83rem;color:rgba(255,255,255,.35);font-style:italic;}
+/* FIRMA */
+.firma-wrap{border:1.5px solid var(--borde);border-radius:6px;background:#fff;overflow:hidden;}
+.firma-hdr{padding:9px 15px;background:var(--crema-o);border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center;font-size:.73rem;color:var(--gris);text-transform:uppercase;letter-spacing:.09em;}
+.btn-clear{background:none;border:1px solid var(--borde);color:var(--gris);padding:4px 9px;border-radius:3px;cursor:pointer;font-size:.7rem;font-family:'Jost',sans-serif;transition:all .2s;}
+.btn-clear:hover{border-color:var(--dorado);color:var(--dorado);}
+canvas{display:block;width:100%;height:150px;cursor:crosshair;touch-action:none;background:#fff;}
+.firma-pie{padding:7px 15px;font-size:.73rem;color:var(--gris);background:var(--crema-o);border-top:1px solid var(--borde);}
+/* TÉRMINOS */
+.term-scroll{height:190px;overflow-y:auto;border:1px solid var(--borde);padding:15px 17px;background:#fff;border-radius:6px;font-size:.8rem;line-height:1.7;color:var(--gris);margin-bottom:13px;}
+.term-scroll h4{font-family:'Cormorant Garamond',serif;font-size:.98rem;color:var(--negro);margin:13px 0 3px;}
+.term-scroll h4:first-child{margin-top:0;}
+.term-check{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:.86rem;-webkit-user-select:none;user-select:none;}
+.term-check input{width:17px;height:17px;accent-color:var(--dorado);cursor:pointer;}
+/* BOTÓN */
+.btn-gen{width:100%;padding:17px;background:var(--dorado);color:#fff;border:none;border-radius:6px;font-family:'Jost',sans-serif;font-size:.86rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .22s;margin-top:11px;}
+.btn-gen:hover:not(:disabled){background:var(--dorado-claro);transform:translateY(-1px);box-shadow:0 8px 20px rgba(184,151,42,.28);}
+.btn-gen:disabled{background:var(--borde);color:var(--gris);cursor:not-allowed;}
+.msg{padding:13px 16px;border-radius:6px;font-size:.86rem;margin-top:13px;display:none;}
+.msg.err{background:#fdf0f0;border:1px solid #f0c0c0;color:#c0392b;display:block;}
+.msg.ok{background:#f0fdf4;border:1px solid #a8e0b8;color:#1a7a3a;display:block;}
+footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;color:rgba(255,255,255,.28);letter-spacing:.08em;}
+@media(max-width:600px){.g2,.g3,.srv-grid,.zona-grid{grid-template-columns:1fr;}.inv-row{grid-template-columns:1fr 1fr;}.hero{padding:36px 20px;}.container{padding:28px 16px 60px;}}
+
+/* ===== ESTILOS CONTRATO PDF PRINTABLE ===== */
+#contratoImprimible{display:none;}
+@media print{
+  body > *:not(#contratoImprimible){display:none!important;}
+  #contratoImprimible{display:block!important;font-family:Georgia,serif;font-size:10pt;color:#000;margin:0;padding:0;}
+  .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;page-break-after:always;}
+  .cp-page:last-child{page-break-after:auto;}
+  .cp-header{text-align:center;border-bottom:2pt solid #1a1410;padding-bottom:10mm;margin-bottom:8mm;}
+  .cp-logo{max-width:65mm;height:auto;}
+  .cp-subtitle{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:#7a6f65;margin-top:4mm;}
+  .cp-titulo{font-size:16pt;font-weight:bold;text-align:center;margin-bottom:6mm;letter-spacing:.05em;}
+  .cp-parrafo{font-size:9pt;line-height:1.65;margin-bottom:4mm;text-align:justify;}
+  table{width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:9pt;}
+  table caption{font-weight:bold;font-size:10pt;background:#1a1410;color:#fff;padding:3mm;text-align:center;letter-spacing:.08em;}
+  td,th{border:0.5pt solid #ddd5c8;padding:2mm 3mm;vertical-align:top;}
+  th{background:#f0ebe1;font-weight:bold;font-size:7.5pt;text-transform:uppercase;color:#7a6f65;white-space:nowrap;}
+  tr:nth-child(even) td{background:#faf7f2;}
+  .cp-total-row td{background:#1a1410!important;color:#fff!important;font-weight:bold;font-size:11pt;}
+  .cp-dep-row td{background:#f5f0e4!important;font-style:italic;font-size:8.5pt;}
+  .cp-nota{background:#faf3e0;border:0.5pt solid #b8972a;padding:3mm;font-size:8pt;color:#7a6f65;margin-bottom:5mm;border-radius:1mm;}
+  .cp-sec-titulo{font-weight:bold;font-size:11pt;border-bottom:1pt solid #1a1410;padding-bottom:1mm;margin:6mm 0 3mm;letter-spacing:.05em;}
+  .cp-clausula{margin-bottom:3mm;}
+  .cp-clausula strong{display:inline-block;min-width:28mm;font-size:8.5pt;}
+  .cp-clausula span{font-size:8.5pt;color:#333;line-height:1.6;}
+  .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:8mm;}
+  .firma-box{border:0.5pt solid #ddd5c8;padding:4mm;background:#faf7f2;}
+  .firma-box .fb-tit{font-size:7.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.1em;color:#7a6f65;margin-bottom:2mm;}
+  .firma-box .fb-dat{font-size:8.5pt;margin-bottom:1.5mm;}
+  .firma-box .fb-img{width:100%;height:28mm;border-bottom:0.5pt solid #999;margin:3mm 0 1mm;display:flex;align-items:center;justify-content:center;}
+  .firma-box .fb-img img{max-height:26mm;max-width:100%;}
+  .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
+  .cp-pie{position:fixed;bottom:10mm;left:0;right:0;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <img id="logoImg" alt="Inés Sánchez Beauty Concept">
+  <div class="hero-tag">Contrato de Servicios de Boda</div>
+  <div class="hero-sub">Completa el formulario · Descarga tu contrato · Firma digitalmente</div>
+</div>
+<div class="intro">
+  <p>Estás a un paso de reservar tu día más especial. Rellena los datos, selecciona los servicios y descarga tu contrato para firmarlo digitalmente.</p>
+</div>
+
+<div class="container">
+
+<!-- 1. DATOS PERSONALES -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-tit">Datos personales</div></div>
+  <div class="g2">
+    <div class="campo"><label>Nombre completo *</label><input type="text" id="nombre" placeholder="Tu nombre y apellidos"></div>
+    <div class="campo"><label>DNI / NIE *</label><input type="text" id="dni" placeholder="12345678A"></div>
+    <div class="campo"><label>Teléfono *</label><input type="tel" id="tel" placeholder="600 000 000"></div>
+    <div class="campo"><label>Email *</label><input type="email" id="email" placeholder="tu@email.com"></div>
+    <div class="campo cf"><label>Dirección completa</label><input type="text" id="dir" placeholder="Calle, número, piso, ciudad"></div>
+  </div>
+</div>
+
+<!-- 2. BODA -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">2</div><div class="sec-tit">Tu boda</div></div>
+  <div class="g3">
+    <div class="campo"><label>Fecha de la boda *</label><input type="date" id="fecha"></div>
+    <div class="campo"><label>Hora de la ceremonia *</label><input type="time" id="hora"></div>
+    <div class="campo"><label>Lugar del evento</label><input type="text" id="lugar" placeholder="Nombre del espacio"></div>
+    <div class="campo cf"><label>Dirección donde se prestará el servicio *</label><input type="text" id="dirSrv" placeholder="Hotel, domicilio..."></div>
+    <div class="campo cf"><label>Segunda dirección (opcional)</label><input type="text" id="dirSrv2" placeholder="Segundo punto de servicio"></div>
+  </div>
+</div>
+
+<!-- 3. SERVICIOS NOVIA -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">3</div><div class="sec-tit">Servicios para la novia</div></div>
+  <div class="srv-grid" id="gridNovia"></div>
+</div>
+
+<!-- 4. INVITADAS -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">4</div><div class="sec-tit">Servicios para invitadas</div></div>
+  <div class="inv-nota"><strong>Flexibilidad total.</strong> Añade las invitadas confirmadas ahora. Podrás ampliar mediante <strong>anexo al contrato</strong> sin coste adicional.</div>
+  <div id="listaInv"></div>
+  <button class="btn-add" id="btnAddInv">+ Añadir invitada confirmada</button>
+  <div class="bc-box">
+    <div class="bc-row">
+      <label class="sw"><input type="checkbox" id="bcOn"><span class="sw-sl"></span></label>
+      <div><div style="font-weight:500;font-size:.9rem;">Beauty Corner en hotel u otro espacio</div><div style="font-size:.76rem;color:var(--gris);margin-top:2px;">Para invitados que vienen de fuera de la ciudad</div></div>
+    </div>
+    <div class="bc-det" id="bcDet">
+      <div class="g2" style="margin-top:13px;">
+        <div class="campo"><label>Hotel / espacio</label><input type="text" id="bcHotel" placeholder="Nombre del espacio"></div>
+        <div class="campo"><label>Dirección</label><input type="text" id="bcDir" placeholder="Dirección"></div>
+        <div class="campo cf"><label>Notas adicionales</label><textarea id="bcNotas" placeholder="Número estimado, horario..."></textarea></div>
+      </div>
+      <div class="inv-nota" style="margin-bottom:0;margin-top:10px;">El presupuesto del Beauty Corner se coordinará y reflejará como anexo al contrato principal.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. DESPLAZAMIENTO -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-tit">Desplazamiento</div></div>
+  <div class="zona-grid" id="gridZonas"></div>
+  <div class="bonif-info" id="infoBonif"></div>
+</div>
+
+<!-- 6. RESUMEN -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-tit">Resumen del presupuesto</div></div>
+  <div class="res-box"><div class="res-tit">Desglose estimado</div><div id="resumen"><div class="res-vacio">Selecciona servicios para ver el presupuesto</div></div></div>
+</div>
+
+<!-- 7. FIRMA -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-tit">Firma digital</div></div>
+  <div class="firma-wrap">
+    <div class="firma-hdr"><span>Firma aquí con el dedo o el ratón</span><button class="btn-clear" id="btnClear">Borrar</button></div>
+    <canvas id="firmaCanvas"></canvas>
+    <div class="firma-pie">Firma con el dedo (tablet/móvil) o con el ratón · Validez legal según Reglamento eIDAS (UE) 910/2014</div>
+  </div>
+</div>
+
+<!-- 8. TÉRMINOS -->
+<div class="sec">
+  <div class="sec-hdr"><div class="sec-num">8</div><div class="sec-tit">Términos y condiciones</div></div>
+  <div class="term-scroll">
+    <h4>1. Objeto del Contrato</h4><p>Prestación de servicios de peluquería y/o maquillaje por ORIGAMI COSMETICS S.L. (marca INÉS SÁNCHEZ BEAUTY CONCEPT) con motivo del enlace matrimonial.</p>
+    <h4>2. Servicios</h4><p>Tiempo estándar ~45 min/persona. Excluidos peinados/maquillajes de complejidad excepcional. Servicios extra: presupuestados aparte.</p>
+    <h4>3. Precio y Pago</h4><p>25% depósito al reservar (no reembolsable salvo desistimiento legal) · 25% entre 6–8 semanas antes · Resto máx. 7 días antes. Métodos: transferencia, tarjeta o efectivo. IVA incluido.</p>
+    <h4>4. Cancelación y Desistimiento</h4><p>14 días naturales de desistimiento desde la firma. Más de 30 días antes: se retiene el depósito. Menos de 30 días: sin devolución. Cancelación por LA EMPRESA sin causa: devolución íntegra.</p>
+    <h4>5. Cambios</h4><p>Cambios de horario/lugar con 10+ días: sin coste. Con menos antelación: posible recargo del 20%.</p>
+    <h4>6. Obligaciones de la Clienta</h4><p>Espacio con electricidad, agua e higiene adecuadas. Informar de alergias o condiciones médicas con antelación.</p>
+    <h4>7. Responsabilidad y Seguro</h4><p>Seguro de RC profesional. Sin responsabilidad por causas ajenas: tráfico, fuerza mayor, condiciones del local.</p>
+    <h4>8. Fuerza Mayor</h4><p>Personal sustituto de equivalente cualificación o reembolso íntegro de cantidades abonadas por servicios no prestados.</p>
+    <h4>9. Protección de Datos</h4><p>Tratamiento conforme RGPD (UE) 2016/679 y LO 3/2018. Uso de imágenes publicitarias: consentimiento escrito previo.</p>
+    <h4>10. Desplazamientos y Bonificaciones</h4><p>Sin desplazamiento: servicio en el centro (C/ Obispo Hurtado 17, Granada). Zona A (Granada capital y periferia): 50€ · Zona B (hasta 40km): 70€ · Zona C (resto provincia): 100€ + 0,26€/km adicional. Bonificaciones A y B: 50% con 3–5 servicios invitadas / 100% con 6+. Bonificaciones C: 40% con 3–5 / 70% con 6+. Aplicadas en factura final si todos los servicios son en mismo lugar y horario.</p>
+    <h4>11. Servicios para Invitadas</h4><p>Coordinadas por LA CLIENTA como contratante principal. Ampliaciones mediante Anexo sin coste de gestión. Precio final ajustado al cierre.</p>
+    <h4>12. Legislación y Jurisdicción</h4><p>Legislación española. Tribunales de Granada, salvo disposición en contrario aplicable a consumidores.</p>
+  </div>
+  <label class="term-check"><input type="checkbox" id="acepta"> He leído y acepto los términos y condiciones del contrato</label>
+</div>
+
+<div id="msgErr" class="msg"></div>
+<div id="msgOk" class="msg"></div>
+<button class="btn-gen" id="btnGen">Generar contrato en PDF</button>
+
+</div><!-- /container -->
+
+<!-- CONTRATO IMPRIMIBLE (invisible, solo para print) -->
+<div id="contratoImprimible"></div>
+
+<footer>INÉS SÁNCHEZ BEAUTY CONCEPT · ORIGAMI COSMETICS S.L. · CIF B19707660 · C/ Obispo Hurtado 17, Granada · inesanchezbeautyconcept@gmail.com</footer>
+
+<script>
+// =================== CONFIG ===================
+var CFG = {
+  serviciosNovia: [
+    {nom:'Maquillaje novia', pre:270},
+    {nom:'Peluquería novia', pre:270},
+    {nom:'Maquillaje + Peluquería novia', pre:390},
+    {nom:'Manicura especial boda', pre:45},
+    {nom:'Mirada perfecta', pre:70},
+    {nom:'Tratamiento facial especial novia', pre:70}
+  ],
+  serviciosInv: [
+    {nom:'Maquillaje', pre:60},
+    {nom:'Peluquería', pre:60},
+    {nom:'Maquillaje y peluquería', pre:95},
+    {nom:'Manicura (desde)', pre:15},
+    {nom:'Tratamiento Eterna Juventud', pre:65}
+  ],
+  zonas: [
+    {et:'En el centro', nm:'Servicio en el centro', pre:0, bonif:null},
+    {et:'Zona A', nm:'Granada capital y periferia', pre:50, bonif:{m:50,t:100}},
+    {et:'Zona B', nm:'Hasta 40 km desde la capital', pre:70, bonif:{m:50,t:100}},
+    {et:'Zona C', nm:'Resto de la provincia', pre:100, bonif:{m:40,t:70}}
+  ]
+};
+
+var EST = {sel:new Set(), invs:[], zona:0, firmaOk:false, nc:0};
+var LOGO = '/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAGQBLADASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAYHBQgCBAkDAf/EAFsQAAEDAwICBQMNCwcJBwUBAAABAgMEBREGBxIhCBMxQVEiYXEUFRYXMjdWdYGRk7HRIzVCUnJzdLKztMEkMzQ4YoKhNkNXdpaiwsPSU1RjlJWj8AlFZYPT4f/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEBf/EADYRAQEAAgAEBAQEAwcFAAAAAAABAhEDEiExEzJB0QQUkaEiUYGxYXHwFTNSYoKSwSNC0uHx/9oADAMBAAIRAxEAPwDcsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/9k=';
+
+// =================== LOGO ===================
+document.getElementById('logoImg').src = 'data:image/png;base64,' + LOGO;
+
+// =================== SERVICIOS NOVIA ===================
+function initNovia(){
+  var g = document.getElementById('gridNovia');
+  g.innerHTML = '';
+  CFG.serviciosNovia.forEach(function(s,i){
+    var d = document.createElement('div');
+    d.className = 'srv-card';
+    d.innerHTML = '<div class="srv-chk">&#10003;</div><div class="srv-info"><div class="srv-nom">'+s.nom+'</div><div class="srv-pre">'+s.pre+' &euro;</div></div>';
+    d.addEventListener('click', function(){
+      if(EST.sel.has(i)){EST.sel.delete(i);d.classList.remove('on');}
+      else{EST.sel.add(i);d.classList.add('on');}
+      actualizarResumen();
+    });
+    g.appendChild(d);
+  });
+}
+
+// =================== ZONAS ===================
+function initZonas(){
+  var g = document.getElementById('gridZonas');
+  g.innerHTML = '';
+  CFG.zonas.forEach(function(z,i){
+    var d = document.createElement('div');
+    d.className = 'zona-card' + (i===0?' on':'');
+    d.innerHTML = '<div class="zona-et">'+z.et+'</div><div class="zona-nm">'+z.nm+'</div><div class="zona-pr">'+(z.pre===0?'&mdash;':z.pre+' &euro;')+'</div>';
+    d.addEventListener('click', function(){
+      document.querySelectorAll('.zona-card').forEach(function(c){c.classList.remove('on');});
+      d.classList.add('on');
+      EST.zona = i;
+      actualizarBonif();
+      actualizarResumen();
+    });
+    g.appendChild(d);
+  });
+  actualizarBonif();
+}
+
+function actualizarBonif(){
+  var z = CFG.zonas[EST.zona];
+  var el = document.getElementById('infoBonif');
+  if(!z.bonif){el.innerHTML='La novia acude al centro. Sin coste de desplazamiento.';return;}
+  el.innerHTML='&#128161; <strong>Bonificación automática:</strong> 3&ndash;5 servicios de invitadas &rarr; <strong>'+z.bonif.m+'% de descuento</strong> &middot; 6 o m&aacute;s &rarr; <strong>'+z.bonif.t+'% de descuento</strong>';
+}
+
+// =================== INVITADAS ===================
+document.getElementById('btnAddInv').addEventListener('click', addInv);
+
+function addInv(){
+  var id = ++EST.nc;
+  EST.invs.push({id:id, nom:'', srvSel:new Set()});
+  var row = document.createElement('div');
+  row.className = 'inv-row';
+  row.id = 'invRow'+id;
+  var checkboxesHTML = CFG.serviciosInv.map(function(s,i){
+    return '<label class="inv-srv-check"><input type="checkbox" data-idx="'+i+'"> '+s.nom+' <span class="inv-pre">'+s.pre+'€</span></label>';
+  }).join('');
+  row.innerHTML = '<div class="campo"><label>Nombre / Relaci&oacute;n</label><input type="text" placeholder="Madre, hermana..."></div>'
+    +'<div class="campo inv-servicios-wrap"><label>Servicios</label><div class="inv-srv-list">'+checkboxesHTML+'</div></div>'
+    +'<button class="btn-rm">&#10005; Quitar</button>';
+  var inp = row.querySelector('input[type=text]');
+  var btn = row.querySelector('.btn-rm');
+  inp.addEventListener('input', function(){var inv=EST.invs.find(function(x){return x.id===id;});if(inv)inv.nom=inp.value;});
+  row.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var inv=EST.invs.find(function(x){return x.id===id;});
+      if(!inv)return;
+      var idx=parseInt(cb.dataset.idx);
+      if(cb.checked)inv.srvSel.add(idx);else inv.srvSel.delete(idx);
+      actualizarResumen();
+    });
+  });
+  btn.addEventListener('click', function(){EST.invs=EST.invs.filter(function(x){return x.id!==id;});row.remove();actualizarBonif();actualizarResumen();});
+  document.getElementById('listaInv').appendChild(row);
+  actualizarBonif();
+  actualizarResumen();
+}
+
+document.getElementById('bcOn').addEventListener('change', function(){
+  document.getElementById('bcDet').classList.toggle('vis', this.checked);
+});
+
+// =================== CÁLCULO ===================
+function calcDesp(){
+  var z = CFG.zonas[EST.zona];
+  if(z.pre===0) return {pre:0, pct:0, txt:''};
+  var n = EST.invs.length, pct=0;
+  if(z.bonif){if(n>=6)pct=z.bonif.t;else if(n>=3)pct=z.bonif.m;}
+  var desc = Math.round(z.pre*pct/100);
+  return {pre:z.pre-desc, pct:pct, txt:pct>0?' (bonif. '+pct+'%):':':'};
+}
+
+// =================== RESUMEN ===================
+function actualizarResumen(){
+  var linNov = Array.from(EST.sel).map(function(i){return CFG.serviciosNovia[i];});
+  var totNov = linNov.reduce(function(s,x){return s+x.pre;},0);
+  var totInv = EST.invs.reduce(function(s,x){return s+Array.from(x.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);},0);
+  var d = calcDesp();
+  var tot = totNov + totInv + d.pre;
+  var dep = (tot*0.25).toFixed(2);
+  var el = document.getElementById('resumen');
+  if(linNov.length===0 && EST.invs.length===0 && d.pre===0){
+    el.innerHTML='<div class="res-vacio">Selecciona servicios para ver el presupuesto</div>';return;
+  }
+  var h='';
+  linNov.forEach(function(s){h+='<div class="res-ln"><span>'+s.nom+'</span><span>'+s.pre+' &euro;</span></div>';});
+  EST.invs.forEach(function(inv){
+    if(inv.srvSel.size===0)return;
+    var nomsSrv=Array.from(inv.srvSel).map(function(i){return CFG.serviciosInv[i].nom;}).join(' + ');
+    var totSrv=Array.from(inv.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);
+    h+='<div class="res-ln"><span>'+(inv.nom||'Invitada')+' &mdash; '+nomsSrv+'</span><span>'+totSrv+' &euro;</span></div>';
+  });
+  if(CFG.zonas[EST.zona].pre>0)h+='<div class="res-ln"><span>'+CFG.zonas[EST.zona].nm+(d.pct>0?' (bonif. '+d.pct+'%)':'')+'</span><span>'+d.pre+' &euro;</span></div>';
+  h+='<div class="res-ln tot"><span>Total estimado (IVA incl.)</span><span>'+tot+' &euro;</span></div>';
+  h+='<div class="res-ln dep"><span>Dep&oacute;sito inicial (25%)</span><span>'+dep+' &euro;</span></div>';
+  el.innerHTML=h;
+}
+
+// =================== FIRMA CANVAS ===================
+var canvas = document.getElementById('firmaCanvas');
+var ctx = canvas.getContext('2d');
+function resizeCanvas(){canvas.width=canvas.offsetWidth;canvas.height=150;}
+window.addEventListener('load', resizeCanvas);
+window.addEventListener('resize', function(){var img=ctx.getImageData(0,0,canvas.width,canvas.height);resizeCanvas();ctx.putImageData(img,0,0);});
+
+var drawing=false, lx=0, ly=0;
+function pt(e){var r=canvas.getBoundingClientRect();if(e.touches)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};return{x:e.clientX-r.left,y:e.clientY-r.top};}
+canvas.addEventListener('mousedown',function(e){drawing=true;var p=pt(e);lx=p.x;ly=p.y;});
+canvas.addEventListener('mousemove',function(e){if(!drawing)return;var p=pt(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a1410';ctx.lineWidth=2;ctx.lineCap='round';ctx.stroke();lx=p.x;ly=p.y;EST.firmaOk=true;});
+canvas.addEventListener('mouseup',function(){drawing=false;});
+canvas.addEventListener('mouseleave',function(){drawing=false;});
+canvas.addEventListener('touchstart',function(e){e.preventDefault();drawing=true;var p=pt(e);lx=p.x;ly=p.y;},{passive:false});
+canvas.addEventListener('touchmove',function(e){e.preventDefault();if(!drawing)return;var p=pt(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a1410';ctx.lineWidth=2;ctx.lineCap='round';ctx.stroke();lx=p.x;ly=p.y;EST.firmaOk=true;},{passive:false});
+canvas.addEventListener('touchend',function(){drawing=false;});
+document.getElementById('btnClear').addEventListener('click',function(){ctx.clearRect(0,0,canvas.width,canvas.height);EST.firmaOk=false;});
+
+// =================== VALIDACIÓN ===================
+function validar(){
+  var campos=[['nombre','Nombre completo'],['dni','DNI/NIE'],['tel','Teléfono'],['email','Email'],['fecha','Fecha de la boda'],['hora','Hora de la ceremonia'],['dirSrv','Dirección del servicio']];
+  for(var i=0;i<campos.length;i++){if(!document.getElementById(campos[i][0]).value.trim())return campos[i][1]+' es obligatorio';}
+  if(EST.sel.size===0)return 'Selecciona al menos un servicio para la novia';
+  if(!EST.firmaOk)return 'La firma digital es obligatoria';
+  if(!document.getElementById('acepta').checked)return 'Debes aceptar los términos y condiciones';
+  return null;
+}
+
+// =================== GENERAR CONTRATO ===================
+document.getElementById('btnGen').addEventListener('click', generarContrato);
+
+function generarContrato(){
+  var err=validar();
+  var eE=document.getElementById('msgErr'); eE.className='msg';
+  var eO=document.getElementById('msgOk'); eO.className='msg';
+  if(err){eE.textContent='⚠ '+err;eE.className='msg err';eE.scrollIntoView({behavior:'smooth',block:'center'});return;}
+
+  var btn=document.getElementById('btnGen');
+  btn.disabled=true; btn.textContent='Preparando contrato…';
+
+  var nombre=document.getElementById('nombre').value.trim();
+  var dni=document.getElementById('dni').value.trim();
+  var tel=document.getElementById('tel').value.trim();
+  var email=document.getElementById('email').value.trim();
+  var dir=document.getElementById('dir').value.trim();
+  var fecha=document.getElementById('fecha').value;
+  var hora=document.getElementById('hora').value;
+  var lugar=document.getElementById('lugar').value.trim();
+  var dirSrv=document.getElementById('dirSrv').value.trim();
+  var dirSrv2=document.getElementById('dirSrv2').value.trim();
+  var fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-ES');
+  var hoy=new Date().toLocaleDateString('es-ES');
+
+  var linNov=Array.from(EST.sel).map(function(i){return CFG.serviciosNovia[i];});
+  var totNov=linNov.reduce(function(s,x){return s+x.pre;},0);
+  var totInv=EST.invs.reduce(function(s,x){return s+Array.from(x.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);},0);
+  var d=calcDesp();
+  var tot=totNov+totInv+d.pre;
+  var dep=(tot*0.25).toFixed(2);
+
+  var firmaDataURL=canvas.toDataURL('image/png');
+
+  // Construir HTML imprimible
+  var bcOn=document.getElementById('bcOn').checked;
+  var bcHotel=document.getElementById('bcHotel').value;
+  var bcDir=document.getElementById('bcDir').value;
+  var bcNotas=document.getElementById('bcNotas').value;
+
+  var invTabla='';
+  if(EST.invs.length>0){
+    EST.invs.forEach(function(inv){
+      var nomsSrv=Array.from(inv.srvSel).map(function(i){return CFG.serviciosInv[i].nom;}).join(' + ');
+      var totSrv=Array.from(inv.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);
+      if(nomsSrv) invTabla+='<tr><td>'+(inv.nom||'—')+'</td><td>'+nomsSrv+'</td><td style="text-align:right;font-weight:bold;">'+totSrv+' €</td></tr>';
+    });
+  } else {
+    invTabla='<tr><td colspan="3" style="font-style:italic;color:#7a6f65;">A confirmar mediante Anexo al contrato</td></tr>';
+  }
+
+  var novTabla='';
+  linNov.forEach(function(s){
+    novTabla+='<tr><td colspan="2">'+s.nom+'</td><td style="text-align:right;font-weight:bold;">'+s.pre+' €</td></tr>';
+  });
+
+  var bcHTML='';
+  if(bcOn){
+    bcHTML='<div class="cp-nota"><strong>BEAUTY CORNER</strong> &mdash; Espacio: '+(bcHotel||'—')+' | Dirección: '+(bcDir||'—')+(bcNotas?'<br>Notas: '+bcNotas:'')+'<br><em>El presupuesto se coordinará y reflejará como Anexo al contrato principal.</em></div>';
+  }
+
+  var despFila='';
+  if(CFG.zonas[EST.zona].pre>0){
+    despFila='<tr><td colspan="2">Desplazamiento — '+CFG.zonas[EST.zona].nm+(d.pct>0?' (bonif. '+d.pct+'%)':'')+'</td><td style="text-align:right;font-weight:bold;">'+d.pre+' €</td></tr>';
+  }
+
+  var html='<div class="cp-page">'
+    +'<div class="cp-header"><img class="cp-logo" src="data:image/png;base64,'+LOGO+'" alt="Inés Sánchez Beauty Concept"><div class="cp-subtitle">C/ Obispo Hurtado 17, Granada &middot; inesanchezbeautyconcept@gmail.com</div></div>'
+    +'<div class="cp-titulo">CONTRATO BODA</div>'
+    +'<p class="cp-parrafo">De una parte, <strong>ORIGAMI COSMETICS S.L.</strong>, con CIF B19707660, y domicilio social en C/ Obispo Hurtado 17 de Granada Capital, representada en este acto por D. Álvaro Quirós Labella, con DNI 44278736X en calidad de Administrador y representante legal, en adelante <em>"LA EMPRESA"</em>.</p>'
+    +'<p class="cp-parrafo">Y de otra, <strong>'+nombre+'</strong>, con DNI: '+dni+(dir?', domicilio en '+dir:'')+', en adelante <em>"LA CLIENTA"</em>.</p>'
+    +'<p class="cp-parrafo">INÉS SÁNCHEZ BEAUTY CONCEPT es la marca comercial bajo la cual LA EMPRESA presta los servicios objeto del presente contrato. Ambas partes reconocen tener capacidad legal suficiente para suscribir el presente contrato, y ORIGAMI COSMETICS S.L. acuerda proporcionar a LA CLIENTA los servicios que se enumeran a continuación:</p>'
+    +'<table><caption>TABLA I &mdash; DATOS DEL SERVICIO</caption>'
+    +'<tr><th>NOMBRE</th><td>'+nombre+'</td><th>EMAIL</th><td>'+email+'</td></tr>'
+    +'<tr><th>FECHA BODA</th><td>'+fechaFmt+'</td><th>HORA</th><td>'+hora+'</td></tr>'
+    +'<tr><th>LUGAR EVENTO</th><td>'+(lugar||'—')+'</td><th>TELÉFONO</th><td>'+tel+'</td></tr>'
+    +'<tr><th>DIR. SERVICIO</th><td>'+dirSrv+'</td><th>2ª DIRECCIÓN</th><td>'+(dirSrv2||'—')+'</td></tr>'
+    +'</table>'
+    +'<table><caption>SERVICIOS PARA LA NOVIA</caption>'
+    +'<tr><th colspan="2">Servicio</th><th style="text-align:right;">Precio</th></tr>'
+    +novTabla+'</table>'
+    +'<table><caption>SERVICIOS PARA INVITADAS (confirmadas a la firma)</caption>'
+    +'<tr><th>Nombre / Relación</th><th>Servicio</th><th style="text-align:right;">Precio</th></tr>'
+    +invTabla+'</table>'
+    +'<div class="cp-nota">Las invitadas podrán ampliarse mediante <strong>Anexo al presente contrato</strong>, sin coste de gestión adicional. El precio final se ajustará según los servicios confirmados.</div>'
+    +bcHTML
+    +'<table><caption>RESUMEN ECONÓMICO</caption>'
+    +'<tr><th colspan="2">Concepto</th><th style="text-align:right;">Importe</th></tr>'
+    +'<tr><td colspan="2">Subtotal servicios novia</td><td style="text-align:right;font-weight:bold;">'+totNov+' €</td></tr>'
+    +(totInv>0?'<tr><td colspan="2">Subtotal servicios invitadas</td><td style="text-align:right;font-weight:bold;">'+totInv+' €</td></tr>':'')
+    +despFila
+    +'<tr class="cp-total-row"><td colspan="2">TOTAL ESTIMADO (IVA incluido)</td><td style="text-align:right;">'+tot+' €</td></tr>'
+    +'<tr class="cp-dep-row"><td colspan="2">Depósito inicial (25%) a abonar al formalizar</td><td style="text-align:right;">'+dep+' €</td></tr>'
+    +'</table>'
+    +'</div>'
+    // PÁGINA 2
+    +'<div class="cp-page">'
+    +'<div class="cp-header" style="padding-bottom:5mm;margin-bottom:5mm;"><strong style="font-size:11pt;letter-spacing:.05em;">TÉRMINOS Y CONDICIONES</strong></div>'
+    +'<div class="cp-clausula"><strong>1. Objeto</strong><span>Prestación de servicios de peluquería y/o maquillaje con motivo del enlace matrimonial.</span></div>'
+    +'<div class="cp-clausula"><strong>2. Servicios</strong><span>Tiempo estándar ~45 min/persona. Excluidos trabajos de complejidad excepcional. Servicios extra: presupuestados y pactados aparte.</span></div>'
+    +'<div class="cp-clausula"><strong>3. Precio y Pago</strong><span>Precios con IVA incluido. 25% depósito al reservar (no reembolsable salvo desistimiento legal) · 25% entre 6–8 semanas antes · Resto máx. 7 días antes. Métodos: transferencia, tarjeta o efectivo.</span></div>'
+    +'<div class="cp-clausula"><strong>4. Cancelación</strong><span>14 días naturales de desistimiento desde la firma. Más de 30 días: retención del depósito. Menos de 30 días: sin devolución. Cancelación por LA EMPRESA sin causa: devolución íntegra.</span></div>'
+    +'<div class="cp-clausula"><strong>5. Cambios</strong><span>Con 10+ días de antelación: sin coste. Con menos: posible recargo del 20% sobre el precio total.</span></div>'
+    +'<div class="cp-clausula"><strong>6. Obligaciones</strong><span>Espacio con electricidad, agua e higiene adecuadas. Informar de alergias o condiciones médicas con antelación.</span></div>'
+    +'<div class="cp-clausula"><strong>7. Responsabilidad</strong><span>Seguro de RC profesional. Sin responsabilidad por causas ajenas: tráfico, fuerza mayor, condiciones del local.</span></div>'
+    +'<div class="cp-clausula"><strong>8. Fuerza Mayor</strong><span>Personal sustituto de equivalente cualificación o reembolso íntegro de cantidades abonadas por servicios no prestados.</span></div>'
+    +'<div class="cp-clausula"><strong>9. Datos Personales</strong><span>Tratamiento conforme RGPD (UE) 2016/679 y LO 3/2018. Uso de imágenes publicitarias: consentimiento escrito previo.</span></div>'
+    +'<div class="cp-clausula"><strong>10. Desplazamientos</strong><span>Sin desplazamiento: servicio en el centro (C/ Obispo Hurtado 17, Granada). Zona A (Granada capital): 50€ · Zona B (hasta 40km): 70€ · Zona C (resto provincia): 100€ + 0,26€/km. Bonif. A y B: 50% (3–5 extras) / 100% (6+). Bonif. C: 40% (3–5 extras) / 70% (6+). Aplicadas en factura final si todos los servicios son en mismo lugar y horario.</span></div>'
+    +'<div class="cp-clausula"><strong>11. Invitadas</strong><span>Coordinadas por LA CLIENTA como contratante principal. Ampliaciones mediante Anexo sin coste de gestión. Precio final ajustado al cierre.</span></div>'
+    +'<div class="cp-clausula"><strong>12. Jurisdicción</strong><span>Legislación española. Tribunales de Granada, salvo disposición en contrario aplicable a consumidores.</span></div>'
+    +'<div style="margin-top:8mm;border-top:1pt solid #ddd5c8;padding-top:6mm;">'
+    +'<div class="firmas-grid">'
+    +'<div class="firma-box"><div class="fb-tit">LA EMPRESA</div><div class="fb-dat"><strong>ORIGAMI COSMETICS S.L.</strong></div><div class="fb-dat">C.I.F.: B19707660</div><div class="fb-dat">Álvaro Quirós Labella</div><div class="fb-dat">DNI: 44278736X</div><div class="fb-img"></div><div class="fb-fecha">FECHA: '+hoy+'</div></div>'
+    +'<div class="firma-box"><div class="fb-tit">LA CLIENTA</div><div class="fb-dat"><strong>'+nombre+'</strong></div><div class="fb-dat">DNI: '+dni+'</div><div class="fb-img"><img src="'+firmaDataURL+'"></div><div class="fb-fecha">FECHA: '+hoy+'</div></div>'
+    +'</div>'
+    +'<p style="font-size:7pt;color:#aaa;text-align:center;margin-top:5mm;">Firma digital con validez legal según Reglamento (UE) 910/2014 (eIDAS).</p>'
+    +'</div>'
+    +'<div class="cp-pie">INÉS SÁNCHEZ BEAUTY CONCEPT · ORIGAMI COSMETICS S.L. · CIF B19707660 · inesanchezbeautyconcept@gmail.com</div>'
+    +'</div>';
+
+  document.getElementById('contratoImprimible').innerHTML = html;
+
+  // Nombre del archivo: fechaevento_nombrenovia
+  var nombreArchivo = fecha.replace(/-/g,'') + '_' + nombre.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ]/g,'');
+  var tituloOriginal = document.title;
+  document.title = nombreArchivo;
+
+  setTimeout(function(){
+    window.print();
+    document.title = tituloOriginal;
+    btn.disabled=false;
+    btn.textContent='Generar contrato en PDF';
+    eO.textContent='✓ Se ha abierto el diálogo de impresión. Elige "Guardar como PDF" para descargar tu contrato.';
+    eO.className='msg ok';
+    eO.scrollIntoView({behavior:'smooth',block:'center'});
+  }, 300);
+}
+
+// =================== INIT ===================
+window.addEventListener('DOMContentLoaded', function(){
+  initNovia();
+  initZonas();
+  actualizarResumen();
+});
+</script>
+</body>
+</html>
