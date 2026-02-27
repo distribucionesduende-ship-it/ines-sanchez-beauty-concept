@@ -7,8 +7,8 @@
 .inv-srv-check input[type=checkbox]{width:15px;height:15px;accent-color:var(--dorado);cursor:pointer;flex-shrink:0;margin:0;}
 .inv-srv-check label{cursor:pointer;line-height:1.3;}
 .inv-pre{color:var(--dorado);font-family:'Cormorant Garamond',serif;font-size:.92rem;margin-left:2px;}
-.btn-add{background:transparent;border:1.5px dashed var(--dorado);color:var(--dorado);padding:10px;width:100%;margin-top:7px;border-radius:4px;font-family:'Jost',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:background .2s;}
-.btn-add:hover{background:rgba(184,151,42,.06);}
+.btn-add{background:#fff;border:1.5px solid var(--borde);color:var(--gris);padding:12px;width:100%;margin-top:7px;border-radius:6px;font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
+.btn-add:hover{border-color:var(--dorado);color:var(--dorado);background:rgba(184,151,42,.03);}
 .btn-rm{background:#fdf0f0;color:#c0392b;border:1px solid #f0d0d0;padding:0 12px;height:40px;border-radius:4px;cursor:pointer;font-size:.82rem;font-family:'Jost',sans-serif;white-space:nowrap;transition:background .2s;}
 .btn-rm:hover{background:#f8d8d8;}ad>
 <meta charset="UTF-8">
@@ -141,6 +141,32 @@ footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;co
   .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
   .cp-pie{position:fixed;bottom:10mm;left:0;right:0;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
 }
+
+/* PRESENTACIÓN */
+.pres-sec{background:transparent;border:none;padding:0;margin-bottom:8px;}
+.pres-onda-top,.pres-onda-bot{width:100%;line-height:0;padding:0 20px;}
+.pres-onda-top svg,.pres-onda-bot svg{width:100%;height:18px;}
+.pres-inner{text-align:center;padding:30px 36px 26px;background:linear-gradient(160deg,rgba(253,248,240,0.95) 0%,rgba(255,255,255,0.98) 60%,rgba(253,248,240,0.9) 100%);border:1px solid rgba(184,151,42,0.2);border-radius:8px;position:relative;}
+.pres-titulo{font-family:'Cormorant Garamond',serif;font-size:1.26rem;font-weight:600;font-style:italic;color:#b8972a;line-height:1.65;margin-bottom:20px;letter-spacing:.01em;}
+.pres-bio{font-family:'Jost',sans-serif;font-size:.875rem;color:#5a4a3a;line-height:1.85;margin-bottom:16px;font-weight:300;letter-spacing:.02em;}
+.pres-bio strong{font-weight:500;color:#3a2e22;}
+.pres-slogan{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:#8a7060;margin-bottom:24px;letter-spacing:.03em;}
+.pres-divider{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;}
+.pres-div-line{flex:1;max-width:80px;height:1px;background:linear-gradient(to right,transparent,rgba(184,151,42,0.4));}
+.pres-div-line:last-child{background:linear-gradient(to left,transparent,rgba(184,151,42,0.4));}
+.pres-div-wave{width:120px;height:12px;flex-shrink:0;}
+.cat-btn-elegante{display:flex;align-items:center;gap:14px;width:100%;max-width:460px;margin:0 auto;background:#fff;border:1.5px solid var(--dorado);border-radius:8px;padding:14px 20px;cursor:pointer;transition:all .25s;text-align:left;font-family:'Jost',sans-serif;box-shadow:0 2px 14px rgba(184,151,42,0.08);}
+.cat-btn-elegante:hover{background:rgba(184,151,42,0.04);transform:translateY(-1px);box-shadow:0 5px 22px rgba(184,151,42,0.16);}
+.cat-icono-elegante{font-size:1.4rem;color:var(--dorado);flex-shrink:0;}
+.cat-texto{display:flex;flex-direction:column;flex:1;}
+.cat-titulo-elegante{font-size:.88rem;font-weight:500;color:#2a1f14;letter-spacing:.04em;}
+.cat-subtitulo{font-size:.72rem;color:var(--gris);letter-spacing:.06em;margin-top:2px;}
+.cat-flecha{font-size:1.1rem;color:var(--dorado);flex-shrink:0;transition:transform .2s;}
+.cat-btn-elegante:hover .cat-flecha{transform:translateX(4px);}
+.bono-novia{display:flex;align-items:center;gap:10px;background:rgba(184,151,42,0.06);border:1px dashed rgba(184,151,42,0.4);border-radius:6px;padding:12px 18px;margin-bottom:10px;font-size:.82rem;color:#5a4a3a;line-height:1.5;}
+.bono-novia strong{color:#2a1f14;}
+.bono-estrella{color:var(--dorado);font-size:.7rem;flex-shrink:0;}
+.bono-texto{flex:1;}
 </style>
 </head>
 <body>
@@ -158,22 +184,58 @@ footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;co
 <div class="container">
 
 <!-- PRESENTACIÓN -->
-<div class="sec presentacion">
-  <div class="pres-body">
-    <div class="pres-texto">
-      <p class="pres-frase">&laquo;Hay bodas que se recuerdan por el vestido.<br>Las que In&eacute;s prepara, se recuerdan por la novia.&raquo;</p>
-      <p class="pres-bio">M&aacute;s de treinta a&ntilde;os transformando momentos especiales en recuerdos eternos. Reconocida como Mejor Artista de Maquillaje de Espa&ntilde;a 2023, Premio Picasso 2021 y 2026, In&eacute;s lleva su arte m&aacute;s all&aacute; de Granada.</p>
-      <p class="pres-bio">Cada novia es &uacute;nica. Cada look, una obra pensada para un momento m&aacute;gico.</p>
-    </div>
-    <div class="pres-catalogo">
-      <div class="cat-card" onclick="descargarCatalogo()">
-        <div class="cat-icono">&#10064;</div>
-        <div class="cat-tit">Cat&aacute;logo Novias</div>
-        <div class="cat-sub">2025 &mdash; 2026</div>
-        <div class="cat-btn">Descargar PDF</div>
-      </div>
-    </div>
+<div class="sec pres-sec">
+
+  <div class="pres-onda-top">
+    <svg viewBox="0 0 400 18" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,9 C40,0 80,18 120,9 C160,0 200,18 240,9 C280,0 320,18 360,9 C380,4 390,7 400,9" stroke="rgba(184,151,42,0.35)" stroke-width="1.2" fill="none"/>
+      <circle cx="200" cy="9" r="3" fill="rgba(184,151,42,0.5)"/>
+    </svg>
   </div>
+
+  <div class="pres-inner">
+    <h2 class="pres-titulo">
+      &laquo;&thinsp;Hay bodas que se recuerdan por el vestido.<br>
+      Las que In&eacute;s prepara, se recuerdan por la novia.&thinsp;&raquo;
+    </h2>
+    <p class="pres-bio">
+      M&aacute;s de treinta a&ntilde;os transformando momentos especiales en recuerdos eternos.<br>
+      Reconocida como <strong>Mejor Artista de Maquillaje de Espa&ntilde;a 2023</strong>, Premio Picasso 2021 y 2026,<br>
+      In&eacute;s lleva su arte m&aacute;s all&aacute; de Granada.
+    </p>
+    <p class="pres-slogan">Cada novia es &uacute;nica. Cada look, una obra pensada para un momento m&aacute;gico.</p>
+    <div class="pres-divider">
+      <span class="pres-div-line"></span>
+      <svg class="pres-div-wave" viewBox="0 0 120 12" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,6 C15,0 30,12 45,6 C60,0 75,12 90,6 C100,2 110,8 120,6" stroke="var(--dorado)" stroke-width="1.2" fill="none"/>
+        <circle cx="60" cy="6" r="2.5" fill="var(--dorado)"/>
+      </svg>
+      <span class="pres-div-line"></span>
+    </div>
+    <button class="cat-btn-elegante" onclick="descargarCatalogo()">
+      <span class="cat-icono-elegante">&#10064;</span>
+      <span class="cat-texto">
+        <span class="cat-titulo-elegante">Cat&aacute;logo Novias 2025&ndash;26</span>
+        <span class="cat-subtitulo">Descubre todos nuestros servicios &middot; Descarga en PDF</span>
+      </span>
+      <span class="cat-flecha">&#8594;</span>
+    </button>
+  </div>
+
+  <div class="pres-onda-bot">
+    <svg viewBox="0 0 400 18" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,9 C40,18 80,0 120,9 C160,18 200,0 240,9 C280,18 320,0 360,9 C380,14 390,11 400,9" stroke="rgba(184,151,42,0.35)" stroke-width="1.2" fill="none"/>
+      <circle cx="200" cy="9" r="3" fill="rgba(184,151,42,0.5)"/>
+    </svg>
+  </div>
+
+</div>
+
+<!-- BONIFICACIÓN NOVIA -->
+<div class="bono-novia">
+  <span class="bono-estrella">&#10022;</span>
+  <span class="bono-texto">In&eacute;s S&aacute;nchez quiere celebrar contigo: todas nuestras novias disfrutan de un <strong>10&nbsp;% de descuento</strong> en el resto de servicios del centro de est&eacute;tica.</span>
+  <span class="bono-estrella">&#10022;</span>
 </div>
 
 <!-- 1. DATOS PERSONALES -->
@@ -218,7 +280,7 @@ footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;co
   <div class="bc-box">
     <div class="bc-row">
       <label class="sw"><input type="checkbox" id="bcOn"><span class="sw-sl"></span></label>
-      <div><div style="font-weight:500;font-size:.9rem;">Beauty Corner en hotel u otro espacio</div><div style="font-size:.76rem;color:var(--gris);margin-top:2px;">Para invitados que vienen de fuera de la ciudad</div></div>
+      <div><div style="font-weight:500;font-size:.9rem;">Puesto de trabajo en el lugar del evento</div><div style="font-size:.76rem;color:var(--gris);margin-top:2px;">Instalación en el hotel, cortijo o finca elegida</div></div>
     </div>
     <div class="bc-det" id="bcDet">
       <div class="g2" style="margin-top:13px;">
