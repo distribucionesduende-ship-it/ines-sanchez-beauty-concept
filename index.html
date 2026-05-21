@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-<he
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inés Sánchez Beauty Concept — Contrato de Boda</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
 .inv-row{display:grid;grid-template-columns:1fr 2fr auto;gap:9px;align-items:start;margin-bottom:9px;padding:11px 13px;background:#fff;border:1px solid var(--borde);border-radius:6px;}
 .inv-srv-list{display:flex;flex-direction:column;gap:5px;margin-top:2px;}
 .inv-srv-check{display:flex;align-items:center;gap:7px;font-size:.82rem;cursor:pointer;}
@@ -10,12 +17,7 @@
 .btn-add{background:#fff;border:1.5px solid var(--borde);color:var(--gris);padding:12px;width:100%;margin-top:7px;border-radius:6px;font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
 .btn-add:hover{border-color:var(--dorado);color:var(--dorado);background:rgba(184,151,42,.03);}
 .btn-rm{background:#fdf0f0;color:#c0392b;border:1px solid #f0d0d0;padding:0 12px;height:40px;border-radius:4px;cursor:pointer;font-size:.82rem;font-family:'Jost',sans-serif;white-space:nowrap;transition:background .2s;}
-.btn-rm:hover{background:#f8d8d8;}ad>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inés Sánchez Beauty Concept — Contrato de Boda</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+.btn-rm:hover{background:#f8d8d8;}
 :root{--negro:#1a1410;--dorado:#b8972a;--dorado-claro:#d4af37;--crema:#faf7f2;--crema-o:#f0ebe1;--gris:#7a6f65;--borde:#ddd5c8;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Jost',sans-serif;background:var(--crema);color:var(--negro);}
@@ -108,39 +110,42 @@ canvas{display:block;width:100%;height:150px;cursor:crosshair;touch-action:none;
 footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;color:rgba(255,255,255,.28);letter-spacing:.08em;}
 @media(max-width:600px){.g2,.g3,.srv-grid,.zona-grid{grid-template-columns:1fr;}.inv-row{grid-template-columns:1fr 1fr;}.hero{padding:36px 20px;}.container{padding:28px 16px 60px;}}
 
-/* ===== ESTILOS CONTRATO PDF PRINTABLE ===== */
-#contratoImprimible{display:none;}
-@media print{
-  body > *:not(#contratoImprimible){display:none!important;}
-  #contratoImprimible{display:block!important;font-family:Georgia,serif;font-size:10pt;color:#000;margin:0;padding:0;}
-  .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;page-break-after:always;}
-  .cp-page:last-child{page-break-after:auto;}
-  .cp-header{text-align:center;border-bottom:2pt solid #1a1410;padding-bottom:10mm;margin-bottom:8mm;}
-  .cp-logo{max-width:65mm;height:auto;}
-  .cp-subtitle{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:#7a6f65;margin-top:4mm;}
-  .cp-titulo{font-size:16pt;font-weight:bold;text-align:center;margin-bottom:6mm;letter-spacing:.05em;}
-  .cp-parrafo{font-size:9pt;line-height:1.65;margin-bottom:4mm;text-align:justify;}
-  table{width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:9pt;}
-  table caption{font-weight:bold;font-size:10pt;background:#1a1410;color:#fff;padding:3mm;text-align:center;letter-spacing:.08em;}
-  td,th{border:0.5pt solid #ddd5c8;padding:2mm 3mm;vertical-align:top;}
-  th{background:#f0ebe1;font-weight:bold;font-size:7.5pt;text-transform:uppercase;color:#7a6f65;white-space:nowrap;}
-  tr:nth-child(even) td{background:#faf7f2;}
-  .cp-total-row td{background:#1a1410!important;color:#fff!important;font-weight:bold;font-size:11pt;}
-  .cp-dep-row td{background:#f5f0e4!important;font-style:italic;font-size:8.5pt;}
-  .cp-nota{background:#faf3e0;border:0.5pt solid #b8972a;padding:3mm;font-size:8pt;color:#7a6f65;margin-bottom:5mm;border-radius:1mm;}
-  .cp-sec-titulo{font-weight:bold;font-size:11pt;border-bottom:1pt solid #1a1410;padding-bottom:1mm;margin:6mm 0 3mm;letter-spacing:.05em;}
-  .cp-clausula{margin-bottom:3mm;}
-  .cp-clausula strong{display:inline-block;min-width:28mm;font-size:8.5pt;}
-  .cp-clausula span{font-size:8.5pt;color:#333;line-height:1.6;}
-  .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:8mm;}
-  .firma-box{border:0.5pt solid #ddd5c8;padding:4mm;background:#faf7f2;}
-  .firma-box .fb-tit{font-size:7.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.1em;color:#7a6f65;margin-bottom:2mm;}
-  .firma-box .fb-dat{font-size:8.5pt;margin-bottom:1.5mm;}
-  .firma-box .fb-img{width:100%;height:28mm;border-bottom:0.5pt solid #999;margin:3mm 0 1mm;display:flex;align-items:center;justify-content:center;}
-  .firma-box .fb-img img{max-height:26mm;max-width:100%;}
-  .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
-  .cp-pie{position:fixed;bottom:10mm;left:0;right:0;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
-}
+/* ===== CONTRATO PDF: contenedor off-screen para captura con html2canvas =====
+   Técnica robusta para soporte móvil (Safari iOS / Chrome Android):
+   - position:fixed + top/left:0 → el navegador lo renderiza correctamente
+   - opacity:0 → invisible al usuario PERO html2canvas SÍ puede capturarlo
+     (a diferencia de visibility:hidden, que rompe la captura)
+   - z-index:-1 → queda detrás de todo
+   - pointer-events:none → no bloquea clics
+   - No usar left:-99999px: html2canvas falla con elementos fuera del viewport
+     en muchos navegadores móviles. */
+#contratoImprimible{position:fixed;left:0;top:0;width:210mm;background:#fff;font-family:Georgia,serif;font-size:10pt;color:#000;margin:0;padding:0;z-index:-1;opacity:0;pointer-events:none;}
+#contratoImprimible .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;background:#fff;box-sizing:border-box;}
+#contratoImprimible .cp-header{text-align:center;border-bottom:2pt solid #1a1410;padding-bottom:10mm;margin-bottom:8mm;}
+#contratoImprimible .cp-logo{max-width:65mm;height:auto;}
+#contratoImprimible .cp-subtitle{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:#7a6f65;margin-top:4mm;}
+#contratoImprimible .cp-titulo{font-size:16pt;font-weight:bold;text-align:center;margin-bottom:6mm;letter-spacing:.05em;}
+#contratoImprimible .cp-parrafo{font-size:9pt;line-height:1.65;margin-bottom:4mm;text-align:justify;}
+#contratoImprimible table{width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:9pt;}
+#contratoImprimible table caption{font-weight:bold;font-size:10pt;background:#1a1410;color:#fff;padding:3mm;text-align:center;letter-spacing:.08em;}
+#contratoImprimible td,#contratoImprimible th{border:0.5pt solid #ddd5c8;padding:2mm 3mm;vertical-align:top;}
+#contratoImprimible th{background:#f0ebe1;font-weight:bold;font-size:7.5pt;text-transform:uppercase;color:#7a6f65;white-space:nowrap;}
+#contratoImprimible tr:nth-child(even) td{background:#faf7f2;}
+#contratoImprimible .cp-total-row td{background:#1a1410!important;color:#fff!important;font-weight:bold;font-size:11pt;}
+#contratoImprimible .cp-dep-row td{background:#f5f0e4!important;font-style:italic;font-size:8.5pt;}
+#contratoImprimible .cp-nota{background:#faf3e0;border:0.5pt solid #b8972a;padding:3mm;font-size:8pt;color:#7a6f65;margin-bottom:5mm;border-radius:1mm;}
+#contratoImprimible .cp-sec-titulo{font-weight:bold;font-size:11pt;border-bottom:1pt solid #1a1410;padding-bottom:1mm;margin:6mm 0 3mm;letter-spacing:.05em;}
+#contratoImprimible .cp-clausula{margin-bottom:3mm;}
+#contratoImprimible .cp-clausula strong{display:inline-block;min-width:28mm;font-size:8.5pt;}
+#contratoImprimible .cp-clausula span{font-size:8.5pt;color:#333;line-height:1.6;}
+#contratoImprimible .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:8mm;}
+#contratoImprimible .firma-box{border:0.5pt solid #ddd5c8;padding:4mm;background:#faf7f2;}
+#contratoImprimible .firma-box .fb-tit{font-size:7.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.1em;color:#7a6f65;margin-bottom:2mm;}
+#contratoImprimible .firma-box .fb-dat{font-size:8.5pt;margin-bottom:1.5mm;}
+#contratoImprimible .firma-box .fb-img{width:100%;height:28mm;border-bottom:0.5pt solid #999;margin:3mm 0 1mm;display:flex;align-items:center;justify-content:center;}
+#contratoImprimible .firma-box .fb-img img{max-height:26mm;max-width:100%;}
+#contratoImprimible .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
+#contratoImprimible .cp-pie{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
 
 /* PRESENTACIÓN */
 .pres-sec{background:transparent;border:none;padding:0;margin-bottom:8px;}
@@ -685,18 +690,143 @@ function generarContrato(){
 
   // Nombre del archivo: fechaevento_nombrenovia
   var nombreArchivo = fecha.replace(/-/g,'') + '_' + nombre.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ]/g,'');
-  var tituloOriginal = document.title;
-  document.title = nombreArchivo;
 
-  setTimeout(function(){
-    window.print();
-    document.title = tituloOriginal;
-    btn.disabled=false;
-    btn.textContent='Generar contrato en PDF';
-    eO.textContent='✓ Se ha abierto el diálogo de impresión. Elige "Guardar como PDF" para descargar tu contrato.';
-    eO.className='msg ok';
-    eO.scrollIntoView({behavior:'smooth',block:'center'});
-  }, 300);
+  btn.textContent='Generando PDF…';
+
+  // Generar PDF con html2canvas + jsPDF (funciona en TODOS los navegadores móviles)
+  generarPDFDescargable(nombreArchivo, nombre, email)
+    .then(function(blob){
+      // Guardar Blob global para Fase B (envío email Resend)
+      window.lastContractPDF = {
+        blob: blob,
+        filename: nombreArchivo + '.pdf',
+        nombre: nombre,
+        email: email
+      };
+      btn.disabled=false;
+      btn.textContent='Generar contrato en PDF';
+      eO.textContent='✓ Tu contrato se ha descargado correctamente. Si no lo encuentras, revisa la carpeta de Descargas de tu dispositivo.';
+      eO.className='msg ok';
+      eO.scrollIntoView({behavior:'smooth',block:'center'});
+    })
+    .catch(function(error){
+      console.error('Error generando PDF:', error);
+      btn.disabled=false;
+      btn.textContent='Generar contrato en PDF';
+      eE.textContent='⚠ Hubo un problema generando el PDF: '+(error.message||error)+'. Por favor, vuelve a intentarlo o contacta con nosotros.';
+      eE.className='msg err';
+      eE.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+}
+
+// =================== GENERACIÓN PDF (jsPDF + html2canvas) ===================
+function generarPDFDescargable(nombreArchivo, nombreCliente, emailCliente){
+  return new Promise(function(resolve, reject){
+    var contenedor = document.getElementById('contratoImprimible');
+
+    // ---- FIX MÓVIL: forzar reflow del DOM tras inyectar el HTML ----
+    // Sin esto, en Safari iOS / Chrome Android html2canvas puede capturar
+    // un contenedor con dimensiones=0 → PDF en blanco.
+    void contenedor.offsetHeight;        // trigger reflow
+    void contenedor.getBoundingClientRect();
+
+    // ---- Esperar a que TODAS las imágenes (logo, firma) carguen ----
+    var imgs = contenedor.querySelectorAll('img');
+    var promesasImg = Array.from(imgs).map(function(img){
+      if(img.complete && img.naturalHeight !== 0) return Promise.resolve();
+      return new Promise(function(res){
+        img.onload = res;
+        img.onerror = res; // resolver igual aunque falle alguna
+        setTimeout(res, 3000); // timeout defensivo
+      });
+    });
+
+    // Detectar si estamos en móvil para ajustar la escala (evita errores de memoria)
+    var esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var escala = esMovil ? 1.5 : 2;
+
+    Promise.all(promesasImg).then(function(){
+      // ---- Pausa adicional de 200ms para garantizar render completo ----
+      // Necesario en Safari iOS porque las fuentes Georgia/Cormorant pueden
+      // estar aún cargándose cuando html2canvas mide el contenedor.
+      return new Promise(function(r){ setTimeout(r, 200); });
+    }).then(function(){
+      // Verificar disponibilidad de librerías
+      if(typeof html2canvas === 'undefined'){
+        return reject(new Error('Librería html2canvas no cargada. Revisa tu conexión a internet y vuelve a intentarlo.'));
+      }
+      if(typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF){
+        return reject(new Error('Librería jsPDF no cargada. Revisa tu conexión a internet y vuelve a intentarlo.'));
+      }
+
+      // ---- Verificación de dimensiones del contenedor ----
+      var rect = contenedor.getBoundingClientRect();
+      console.log('[Contrato] Dimensiones contenedor:', rect.width, 'x', rect.height);
+      if(rect.width < 100 || rect.height < 100){
+        return reject(new Error('El contenedor del contrato no se ha renderizado correctamente. Recarga la página y vuelve a intentarlo.'));
+      }
+
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      var paginas = contenedor.querySelectorAll('.cp-page');
+      if(paginas.length === 0){
+        return reject(new Error('No se ha podido generar el contenido del contrato.'));
+      }
+      console.log('[Contrato] Páginas a procesar:', paginas.length, '| Escala:', escala, '| Móvil:', esMovil);
+
+      // Capturar cada página secuencialmente
+      var procesarPagina = function(index){
+        if(index >= paginas.length){
+          // Todas las páginas capturadas: descargar y devolver blob
+          try {
+            pdf.save(nombreArchivo + '.pdf');
+            var blob = pdf.output('blob');
+            return resolve(blob);
+          } catch(e) {
+            return reject(e);
+          }
+        }
+
+        html2canvas(paginas[index], {
+          scale: escala,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          logging: false,
+          windowWidth: 794,      // ancho equivalente a 210mm a 96dpi
+          width: 794,
+          imageTimeout: 5000,
+          // foreignObjectRendering:false fuerza el motor canvas tradicional,
+          // más lento pero MUCHO más fiable en Safari iOS.
+          foreignObjectRendering: false
+        }).then(function(canvas){
+          console.log('[Contrato] Página', index+1, 'capturada:', canvas.width, 'x', canvas.height);
+
+          // ---- Verificación anti-PDF-en-blanco ----
+          if(canvas.width < 10 || canvas.height < 10){
+            return reject(new Error('La captura de la página '+(index+1)+' está vacía. Por favor, recarga la página y vuelve a intentarlo.'));
+          }
+
+          var imgData = canvas.toDataURL('image/jpeg', 0.92);
+          if(index > 0) pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+          // Llamada con pequeño delay entre páginas para liberar memoria en móviles
+          setTimeout(function(){ procesarPagina(index + 1); }, 50);
+        }).catch(function(err){
+          console.error('[Contrato] Error en página', index+1, err);
+          reject(err);
+        });
+      };
+
+      procesarPagina(0);
+    }).catch(reject);
+  });
 }
 
 // =================== INIT ===================
