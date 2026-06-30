@@ -54,7 +54,26 @@ module.exports = async (req, res) => {
       if (!r2.ok) console.error('Resend confirm error:', r2Result);
     }
 
-    return res.status(200).json({ ok: true, notif: j1, confirm: r2Result });
+    // ---- GOOGLE SHEETS: guardar datos en la hoja ----
+    var sheetResult = null;
+    const sheetUrl = process.env.GOOGLE_SHEET_WEBHOOK;
+    if (sheetUrl) {
+      try {
+        const rSheet = await fetch(sheetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(d),
+          redirect: 'follow'   // Apps Script redirige tras el POST
+        });
+        sheetResult = await rSheet.text();
+        console.log('Google Sheets OK:', sheetResult);
+      } catch (sheetErr) {
+        console.error('Google Sheets error:', sheetErr);
+        // No bloqueante: si falla Sheets, los emails ya se enviaron
+      }
+    }
+
+    return res.status(200).json({ ok: true, notif: j1, confirm: r2Result, sheet: sheetResult });
 
   } catch (err) {
     console.error('send-email error:', err);
