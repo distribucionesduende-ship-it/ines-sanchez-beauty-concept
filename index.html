@@ -17,7 +17,12 @@
 .btn-add{background:#fff;border:1.5px solid var(--borde);color:var(--gris);padding:12px;width:100%;margin-top:7px;border-radius:6px;font-family:'Jost',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
 .btn-add:hover{border-color:var(--dorado);color:var(--dorado);background:rgba(184,151,42,.03);}
 .btn-rm{background:#fdf0f0;color:#c0392b;border:1px solid #f0d0d0;padding:0 12px;height:40px;border-radius:4px;cursor:pointer;font-size:.82rem;font-family:'Jost',sans-serif;white-space:nowrap;transition:background .2s;}
-.btn-rm:hover{background:#f8d8d8;}
+.btn-rm:hover{background:#f8d8d8;}ad>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inés Sánchez Beauty Concept — Contrato de Boda</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
 :root{--negro:#1a1410;--dorado:#b8972a;--dorado-claro:#d4af37;--crema:#faf7f2;--crema-o:#f0ebe1;--gris:#7a6f65;--borde:#ddd5c8;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Jost',sans-serif;background:var(--crema);color:var(--negro);}
@@ -110,15 +115,11 @@ canvas{display:block;width:100%;height:150px;cursor:crosshair;touch-action:none;
 footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;color:rgba(255,255,255,.28);letter-spacing:.08em;}
 @media(max-width:600px){.g2,.g3,.srv-grid,.zona-grid{grid-template-columns:1fr;}.inv-row{grid-template-columns:1fr 1fr;}.hero{padding:36px 20px;}.container{padding:28px 16px 60px;}}
 
-/* ===== CONTRATO PDF: contenedor off-screen para captura con html2canvas =====
-   Técnica robusta para soporte móvil (Safari iOS / Chrome Android):
-   - position:fixed + top/left:0 → el navegador lo renderiza correctamente
-   - opacity:0 → invisible al usuario PERO html2canvas SÍ puede capturarlo
-     (a diferencia de visibility:hidden, que rompe la captura)
-   - z-index:-1 → queda detrás de todo
-   - pointer-events:none → no bloquea clics
-   - No usar left:-99999px: html2canvas falla con elementos fuera del viewport
-     en muchos navegadores móviles. */
+/* ===== CONTRATO PDF: off-screen para captura con html2canvas ===== */
+/* Técnica: position:fixed + opacity:0 → el navegador renderiza el contenido
+   (necesario para que html2canvas mida bien en Safari iOS y Chrome Android),
+   pero es invisible al usuario. NO usar left:-99999px ni visibility:hidden
+   porque html2canvas falla al capturar esos elementos en móviles. */
 #contratoImprimible{position:fixed;left:0;top:0;width:210mm;background:#fff;font-family:Georgia,serif;font-size:10pt;color:#000;margin:0;padding:0;z-index:-1;opacity:0;pointer-events:none;}
 #contratoImprimible .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;background:#fff;box-sizing:border-box;}
 #contratoImprimible .cp-header{text-align:center;border-bottom:2pt solid #1a1410;padding-bottom:10mm;margin-bottom:8mm;}
@@ -146,6 +147,7 @@ footer{background:var(--negro);text-align:center;padding:26px;font-size:.7rem;co
 #contratoImprimible .firma-box .fb-img img{max-height:26mm;max-width:100%;}
 #contratoImprimible .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
 #contratoImprimible .cp-pie{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
+.res-ln.dto{color:#e67e22;}
 
 /* PRESENTACIÓN */
 .pres-sec{background:transparent;border:none;padding:0;margin-bottom:8px;}
@@ -498,13 +500,26 @@ function initInvitadas(){
 
 
 // =================== CÁLCULO ===================
+// Leer ajustes desde parámetros de URL (?dto=10&desp=2)
+var URL_PARAMS = new URLSearchParams(window.location.search);
+var PARAM_DTO = Math.max(0, Math.min(100, parseFloat(URL_PARAMS.get('dto')) || 0));
+var PARAM_DESP = Math.max(1, parseInt(URL_PARAMS.get('desp')) || 1);
+
 function calcDesp(){
   var z = CFG.zonas[EST.zona];
-  if(z.pre===0) return {pre:0, pct:0, txt:''};
+  if(z.pre===0) return {pre:0, pct:0, txt:'', comp:1, preBase:0};
   var n = EST.invs.length, pct=0;
   if(z.bonif){if(n>=6)pct=z.bonif.t;else if(n>=3)pct=z.bonif.m;}
   var desc = Math.round(z.pre*pct/100);
-  return {pre:z.pre-desc, pct:pct, txt:pct>0?' (bonif. '+pct+'%):':':'};
+  var preConBonif = z.pre - desc;
+  // Dividir entre contratos compartidos (parámetro URL ?desp=N)
+  var comp = PARAM_DESP;
+  var preFinal = Math.round(preConBonif / comp * 100) / 100;
+  return {pre:preFinal, pct:pct, txt:pct>0?' (bonif. '+pct+'%):':':', comp:comp, preBase:preConBonif};
+}
+
+function calcDto(){
+  return PARAM_DTO;
 }
 
 // =================== RESUMEN ===================
@@ -515,7 +530,14 @@ function actualizarResumen(){
   var totComb = linComb.reduce(function(s,x){return s+x.pre;},0);
   var totInv = EST.invs.reduce(function(s,x){return s+Array.from(x.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);},0);
   var d = calcDesp();
-  var tot = totNov + totComb + totInv + d.pre;
+
+  // Descuento comercial
+  var dtoPct = calcDto();
+  var subtotalServ = totNov + totComb + totInv;
+  var dtoImporte = Math.round(subtotalServ * dtoPct / 100 * 100) / 100;
+  var subtotalConDto = subtotalServ - dtoImporte;
+
+  var tot = subtotalConDto + d.pre;
   var dep = (tot*0.25).toFixed(2);
   var el = document.getElementById('resumen');
   if(linNov.length===0 && EST.selComb.size===0 && EST.invs.length===0 && d.pre===0){
@@ -530,8 +552,17 @@ function actualizarResumen(){
     var totSrv=Array.from(inv.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);
     h+='<div class="res-ln"><span>'+(inv.nom||'Invitada')+' &mdash; '+nomsSrv+'</span><span>'+totSrv+' &euro;</span></div>';
   });
-  if(CFG.zonas[EST.zona].pre>0)h+='<div class="res-ln"><span>'+CFG.zonas[EST.zona].nm+(d.pct>0?' (bonif. '+d.pct+'%)':'')+'</span><span>'+d.pre+' &euro;</span></div>';
-  h+='<div class="res-ln tot"><span>Total estimado (IVA incl.)</span><span>'+tot+' &euro;</span></div>';
+  // Línea de descuento
+  if(dtoPct > 0){
+    h+='<div class="res-ln dto"><span>Descuento comercial ('+dtoPct+'%)</span><span>&minus;'+dtoImporte.toFixed(2)+' &euro;</span></div>';
+  }
+  // Línea de desplazamiento — solo precio final, sin jerga técnica
+  if(CFG.zonas[EST.zona].pre>0){
+    var despTxt = CFG.zonas[EST.zona].nm;
+    if(d.pct>0) despTxt += ' (bonif. '+d.pct+'%)';
+    h+='<div class="res-ln"><span>Desplazamiento &mdash; '+despTxt+'</span><span>'+d.pre+' &euro;</span></div>';
+  }
+  h+='<div class="res-ln tot"><span>Total estimado (IVA incl.)</span><span>'+tot.toFixed(2)+' &euro;</span></div>';
   h+='<div class="res-ln dep"><span>Dep&oacute;sito inicial (25%)</span><span>'+dep+' &euro;</span></div>';
   el.innerHTML=h;
 }
@@ -539,9 +570,9 @@ function actualizarResumen(){
 // =================== FIRMA CANVAS ===================
 var canvas = document.getElementById('firmaCanvas');
 var ctx = canvas.getContext('2d');
-function resizeCanvas(){canvas.width=canvas.offsetWidth;canvas.height=150;}
+function resizeCanvas(){var w=canvas.offsetWidth;if(w>0){canvas.width=w;canvas.height=150;}}
 window.addEventListener('load', resizeCanvas);
-window.addEventListener('resize', function(){var img=ctx.getImageData(0,0,canvas.width,canvas.height);resizeCanvas();ctx.putImageData(img,0,0);});
+window.addEventListener('resize', function(){if(canvas.width>0&&canvas.height>0){var img=ctx.getImageData(0,0,canvas.width,canvas.height);resizeCanvas();ctx.putImageData(img,0,0);}else{resizeCanvas();}});
 
 var drawing=false, lx=0, ly=0;
 function pt(e){var r=canvas.getBoundingClientRect();if(e.touches)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};return{x:e.clientX-r.left,y:e.clientY-r.top};}
@@ -591,11 +622,21 @@ function generarContrato(){
   var fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-ES');
   var hoy=new Date().toLocaleDateString('es-ES');
 
+  // Servicios novia (principales + combinados)
   var linNov=Array.from(EST.sel).map(function(i){return CFG.serviciosNovia[i];});
   var totNov=linNov.reduce(function(s,x){return s+x.pre;},0);
+  var linComb=Array.from(EST.selComb).map(function(i){return CFG.combinadosNovia[i];});
+  var totComb=linComb.reduce(function(s,x){return s+x.pre;},0);
   var totInv=EST.invs.reduce(function(s,x){return s+Array.from(x.srvSel).reduce(function(a,i){return a+CFG.serviciosInv[i].pre;},0);},0);
   var d=calcDesp();
-  var tot=totNov+totInv+d.pre;
+
+  // Descuento comercial
+  var dtoPct = calcDto();
+  var subtotalServ = totNov + totComb + totInv;
+  var dtoImporte = Math.round(subtotalServ * dtoPct / 100 * 100) / 100;
+  var subtotalConDto = subtotalServ - dtoImporte;
+
+  var tot = subtotalConDto + d.pre;
   var dep=(tot*0.25).toFixed(2);
 
   var firmaDataURL=canvas.toDataURL('image/png');
@@ -617,8 +658,12 @@ function generarContrato(){
     invTabla='<tr><td colspan="3" style="font-style:italic;color:#7a6f65;">A confirmar mediante Anexo al contrato</td></tr>';
   }
 
+  // Tabla servicios novia: incluye principales + combinados
   var novTabla='';
   linNov.forEach(function(s){
+    novTabla+='<tr><td colspan="2">'+s.nom+'</td><td style="text-align:right;font-weight:bold;">'+s.pre+' €</td></tr>';
+  });
+  linComb.forEach(function(s){
     novTabla+='<tr><td colspan="2">'+s.nom+'</td><td style="text-align:right;font-weight:bold;">'+s.pre+' €</td></tr>';
   });
 
@@ -627,9 +672,18 @@ function generarContrato(){
     bcHTML='<div class="cp-nota"><strong>BEAUTY CORNER</strong> &mdash; Espacio: '+(bcHotel||'—')+' | Dirección: '+(bcDir||'—')+(bcNotas?'<br>Notas: '+bcNotas:'')+'<br><em>El presupuesto se coordinará y reflejará como Anexo al contrato principal.</em></div>';
   }
 
+  // Fila de desplazamiento — solo precio final
   var despFila='';
   if(CFG.zonas[EST.zona].pre>0){
-    despFila='<tr><td colspan="2">Desplazamiento — '+CFG.zonas[EST.zona].nm+(d.pct>0?' (bonif. '+d.pct+'%)':'')+'</td><td style="text-align:right;font-weight:bold;">'+d.pre+' €</td></tr>';
+    var despTxt = CFG.zonas[EST.zona].nm;
+    if(d.pct>0) despTxt += ' (bonif. '+d.pct+'%)';
+    despFila='<tr><td colspan="2">Desplazamiento — '+despTxt+'</td><td style="text-align:right;font-weight:bold;">'+d.pre+' €</td></tr>';
+  }
+
+  // Fila de descuento
+  var dtoFila='';
+  if(dtoPct > 0){
+    dtoFila='<tr><td colspan="2" style="color:#e67e22;">Descuento comercial ('+dtoPct+'%)</td><td style="text-align:right;font-weight:bold;color:#e67e22;">&minus;'+dtoImporte.toFixed(2)+' €</td></tr>';
   }
 
   var html='<div class="cp-page">'
@@ -654,10 +708,11 @@ function generarContrato(){
     +bcHTML
     +'<table><caption>RESUMEN ECONÓMICO</caption>'
     +'<tr><th colspan="2">Concepto</th><th style="text-align:right;">Importe</th></tr>'
-    +'<tr><td colspan="2">Subtotal servicios novia</td><td style="text-align:right;font-weight:bold;">'+totNov+' €</td></tr>'
+    +'<tr><td colspan="2">Subtotal servicios novia</td><td style="text-align:right;font-weight:bold;">'+(totNov+totComb)+' €</td></tr>'
     +(totInv>0?'<tr><td colspan="2">Subtotal servicios invitadas</td><td style="text-align:right;font-weight:bold;">'+totInv+' €</td></tr>':'')
+    +dtoFila
     +despFila
-    +'<tr class="cp-total-row"><td colspan="2">TOTAL ESTIMADO (IVA incluido)</td><td style="text-align:right;">'+tot+' €</td></tr>'
+    +'<tr class="cp-total-row"><td colspan="2">TOTAL ESTIMADO (IVA incluido)</td><td style="text-align:right;">'+tot.toFixed(2)+' €</td></tr>'
     +'<tr class="cp-dep-row"><td colspan="2">Depósito inicial (25%) a abonar al formalizar</td><td style="text-align:right;">'+dep+' €</td></tr>'
     +'</table>'
     +'</div>'
@@ -693,21 +748,63 @@ function generarContrato(){
 
   btn.textContent='Generando PDF…';
 
+  // Recopilar datos del formulario para envío por email
+  var formData = {
+    nombre: nombre, dni: dni, tel: tel, email: email, dir: dir,
+    fecha: fecha, fechaFmt: fechaFmt, hora: hora,
+    lugar: lugar, dirSrv: dirSrv, dirSrv2: dirSrv2,
+    serviciosNovia: linNov.map(function(s){ return s.nom + ': ' + s.pre + ' €'; }),
+    combinados: linComb.map(function(s){ return s.nom + ': ' + s.pre + ' €'; }),
+    invitadas: EST.invs.filter(function(inv){ return inv.srvSel.size > 0; }).map(function(inv){
+      var srvs = Array.from(inv.srvSel).map(function(i){ return CFG.serviciosInv[i].nom; }).join(' + ');
+      var t = Array.from(inv.srvSel).reduce(function(a,i){ return a + CFG.serviciosInv[i].pre; }, 0);
+      return (inv.nom || 'Invitada') + ': ' + srvs + ' — ' + t + ' €';
+    }),
+    zona: CFG.zonas[EST.zona].nm,
+    desplazamiento: d.pre,
+    beautyCorner: bcOn ? { hotel: bcHotel, dir: bcDir, notas: bcNotas } : null,
+    subtotalNovia: totNov + totComb,
+    subtotalInvitadas: totInv,
+    descuentoPct: dtoPct,
+    descuentoImporte: dtoImporte,
+    total: tot,
+    deposito: dep,
+    timestamp: new Date().toISOString()
+  };
+
   // Generar PDF con html2canvas + jsPDF (funciona en TODOS los navegadores móviles)
   generarPDFDescargable(nombreArchivo, nombre, email)
     .then(function(blob){
-      // Guardar Blob global para Fase B (envío email Resend)
       window.lastContractPDF = {
-        blob: blob,
-        filename: nombreArchivo + '.pdf',
-        nombre: nombre,
-        email: email
+        blob: blob, filename: nombreArchivo + '.pdf',
+        nombre: nombre, email: email
       };
       btn.disabled=false;
       btn.textContent='Generar contrato en PDF';
       eO.textContent='✓ Tu contrato se ha descargado correctamente. Si no lo encuentras, revisa la carpeta de Descargas de tu dispositivo.';
       eO.className='msg ok';
       eO.scrollIntoView({behavior:'smooth',block:'center'});
+
+      // Enviar emails (notificación a DyD + confirmación a novia)
+      // No bloquea la descarga del PDF — si falla, el contrato ya se descargó
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(result){
+        if(result.ok){
+          console.log('[Email] Notificaciones enviadas correctamente');
+          eO.textContent='✓ Contrato descargado y notificaciones enviadas correctamente.';
+        } else {
+          console.warn('[Email] Respuesta inesperada:', result);
+        }
+      })
+      .catch(function(err){
+        console.warn('[Email] No se pudieron enviar las notificaciones:', err);
+        // No mostrar error a la novia — el PDF ya se descargó bien
+      });
     })
     .catch(function(error){
       console.error('Error generando PDF:', error);
@@ -724,106 +821,77 @@ function generarPDFDescargable(nombreArchivo, nombreCliente, emailCliente){
   return new Promise(function(resolve, reject){
     var contenedor = document.getElementById('contratoImprimible');
 
-    // ---- FIX MÓVIL: forzar reflow del DOM tras inyectar el HTML ----
-    // Sin esto, en Safari iOS / Chrome Android html2canvas puede capturar
-    // un contenedor con dimensiones=0 → PDF en blanco.
-    void contenedor.offsetHeight;        // trigger reflow
+    // Forzar reflow del DOM tras inyectar el HTML
+    void contenedor.offsetHeight;
     void contenedor.getBoundingClientRect();
 
-    // ---- Esperar a que TODAS las imágenes (logo, firma) carguen ----
+    // Esperar a que TODAS las imágenes (logo, firma) carguen
     var imgs = contenedor.querySelectorAll('img');
     var promesasImg = Array.from(imgs).map(function(img){
       if(img.complete && img.naturalHeight !== 0) return Promise.resolve();
       return new Promise(function(res){
         img.onload = res;
-        img.onerror = res; // resolver igual aunque falle alguna
-        setTimeout(res, 3000); // timeout defensivo
+        img.onerror = res;
+        setTimeout(res, 3000);
       });
     });
 
-    // Detectar si estamos en móvil para ajustar la escala (evita errores de memoria)
+    // Escala adaptativa: 1.5 en móvil (evita errores de memoria), 2 en desktop
     var esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     var escala = esMovil ? 1.5 : 2;
 
     Promise.all(promesasImg).then(function(){
-      // ---- Pausa adicional de 200ms para garantizar render completo ----
-      // Necesario en Safari iOS porque las fuentes Georgia/Cormorant pueden
-      // estar aún cargándose cuando html2canvas mide el contenedor.
+      // Pausa de 200ms para render completo de fuentes y estilos
       return new Promise(function(r){ setTimeout(r, 200); });
     }).then(function(){
-      // Verificar disponibilidad de librerías
       if(typeof html2canvas === 'undefined'){
-        return reject(new Error('Librería html2canvas no cargada. Revisa tu conexión a internet y vuelve a intentarlo.'));
+        return reject(new Error('Librería html2canvas no cargada. Revisa tu conexión a internet.'));
       }
       if(typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF){
-        return reject(new Error('Librería jsPDF no cargada. Revisa tu conexión a internet y vuelve a intentarlo.'));
+        return reject(new Error('Librería jsPDF no cargada. Revisa tu conexión a internet.'));
       }
 
-      // ---- Verificación de dimensiones del contenedor ----
       var rect = contenedor.getBoundingClientRect();
-      console.log('[Contrato] Dimensiones contenedor:', rect.width, 'x', rect.height);
+      console.log('[Contrato] Contenedor:', rect.width, 'x', rect.height);
       if(rect.width < 100 || rect.height < 100){
-        return reject(new Error('El contenedor del contrato no se ha renderizado correctamente. Recarga la página y vuelve a intentarlo.'));
+        return reject(new Error('El contenedor del contrato no se ha renderizado. Recarga la página y vuelve a intentarlo.'));
       }
 
       var jsPDF = window.jspdf.jsPDF;
-      var pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
-
+      var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4', compress:true });
       var paginas = contenedor.querySelectorAll('.cp-page');
       if(paginas.length === 0){
         return reject(new Error('No se ha podido generar el contenido del contrato.'));
       }
-      console.log('[Contrato] Páginas a procesar:', paginas.length, '| Escala:', escala, '| Móvil:', esMovil);
+      console.log('[Contrato] Páginas:', paginas.length, '| Escala:', escala, '| Móvil:', esMovil);
 
-      // Capturar cada página secuencialmente
       var procesarPagina = function(index){
         if(index >= paginas.length){
-          // Todas las páginas capturadas: descargar y devolver blob
           try {
             pdf.save(nombreArchivo + '.pdf');
             var blob = pdf.output('blob');
             return resolve(blob);
-          } catch(e) {
-            return reject(e);
-          }
+          } catch(e) { return reject(e); }
         }
-
         html2canvas(paginas[index], {
-          scale: escala,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: '#ffffff',
-          logging: false,
-          windowWidth: 794,      // ancho equivalente a 210mm a 96dpi
-          width: 794,
-          imageTimeout: 5000,
-          // foreignObjectRendering:false fuerza el motor canvas tradicional,
-          // más lento pero MUCHO más fiable en Safari iOS.
+          scale: escala, useCORS: true, allowTaint: false,
+          backgroundColor: '#ffffff', logging: false,
+          windowWidth: 794, width: 794, imageTimeout: 5000,
           foreignObjectRendering: false
         }).then(function(canvas){
-          console.log('[Contrato] Página', index+1, 'capturada:', canvas.width, 'x', canvas.height);
-
-          // ---- Verificación anti-PDF-en-blanco ----
+          console.log('[Contrato] Pág.', index+1, ':', canvas.width, 'x', canvas.height);
           if(canvas.width < 10 || canvas.height < 10){
-            return reject(new Error('La captura de la página '+(index+1)+' está vacía. Por favor, recarga la página y vuelve a intentarlo.'));
+            return reject(new Error('La captura de la página '+(index+1)+' está vacía.'));
           }
-
           var imgData = canvas.toDataURL('image/jpeg', 0.92);
           if(index > 0) pdf.addPage();
           pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-          // Llamada con pequeño delay entre páginas para liberar memoria en móviles
           setTimeout(function(){ procesarPagina(index + 1); }, 50);
         }).catch(function(err){
-          console.error('[Contrato] Error en página', index+1, err);
+          console.error('[Contrato] Error pág.', index+1, err);
           reject(err);
         });
       };
-
       procesarPagina(0);
     }).catch(reject);
   });
