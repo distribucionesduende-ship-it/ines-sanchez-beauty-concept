@@ -1,13 +1,5 @@
 {
   "version": 2,
-  "framework": null,
-  "outputDirectory": ".",
-  "builds": [
-    {
-      "src": "**/*",
-      "use": "@vercel/static"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
