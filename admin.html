@@ -64,6 +64,26 @@ table.tbl tr:hover td{background:#fbf9f5;}
 .btn-guardar{background:var(--negro);color:#fff;border:none;padding:11px 22px;border-radius:5px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-top:8px;}
 .btn-guardar:hover:not(:disabled){background:var(--dorado);}
 .btn-guardar:disabled{background:var(--borde);cursor:not-allowed;}
+/* NUEVO CONTRATO */
+.nc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;}
+.nc-grid .campo{display:flex;flex-direction:column;gap:4px;}
+.nc-grid label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);}
+.nc-grid input,.nc-grid select,.nc-grid textarea{border:1px solid var(--borde);padding:8px 10px;border-radius:4px;font-family:'Jost',sans-serif;font-size:.85rem;}
+.nc-subtit{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gris);margin:16px 0 8px;}
+.nc-chk-list{display:flex;flex-direction:column;gap:6px;}
+.nc-chk-row{display:flex;align-items:center;gap:8px;font-size:.85rem;}
+.nc-chk-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--dorado);}
+.nc-inv-row{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--borde);border-radius:6px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap;}
+.nc-inv-row input[type=text]{border:1px solid var(--borde);padding:7px 9px;border-radius:4px;font-size:.83rem;width:160px;}
+.nc-inv-row .nc-chk-list{flex:1;flex-direction:row;flex-wrap:wrap;gap:12px;}
+.nc-inv-row .btn-rm{background:#fdf0f0;color:var(--err);border:1px solid #f0d0d0;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:.75rem;}
+.btn-add{background:#fff;border:1px solid var(--borde);color:var(--gris);padding:9px 14px;border-radius:4px;font-size:.78rem;cursor:pointer;margin-bottom:10px;}
+.btn-add:hover{border-color:var(--dorado);color:var(--dorado);}
+.nc-resumen{background:var(--negro);color:#fff;border-radius:6px;padding:14px 18px;margin:14px 0;font-size:.85rem;}
+.nc-resumen .ln{display:flex;justify-content:space-between;padding:3px 0;}
+.nc-resumen .tot{font-weight:600;color:var(--dorado-claro);border-top:1px solid rgba(255,255,255,.2);margin-top:6px;padding-top:6px;}
+.nc-resultado{margin-top:14px;padding:14px 16px;background:#f0fdf4;border:1px solid #a8e0b8;border-radius:6px;}
+.nc-resultado input{width:100%;border:1px solid var(--borde);padding:9px 10px;border-radius:4px;font-size:.82rem;margin:8px 0;background:#fff;}
 /* CONTRATO (offscreen, para regenerar el PDF — copiado de index.html) */
 #contratoImprimible{position:fixed;left:0;top:0;width:210mm;background:#fff;font-family:Georgia,serif;font-size:10pt;color:#000;margin:0;padding:0;z-index:-1;opacity:0;pointer-events:none;}
 #contratoImprimible .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;background:#fff;box-sizing:border-box;}
@@ -145,6 +165,63 @@ table.tbl tr:hover td{background:#fbf9f5;}
       <div class="precios-fuente" id="preciosFuente"></div>
       <div id="preciosWrap"><div class="estado-vacio">Cargando precios…</div></div>
       <button class="btn-guardar" id="btnGuardarPrecios" type="button">Guardar precios</button>
+    </section>
+
+    <section class="card">
+      <h2>Nuevo contrato (enlace de firma)</h2>
+      <div class="nc-subtit">Datos de la novia</div>
+      <div class="nc-grid">
+        <div class="campo"><label>Nombre completo</label><input type="text" id="ncNombre"></div>
+        <div class="campo"><label>DNI/NIE</label><input type="text" id="ncDni"></div>
+        <div class="campo"><label>Teléfono</label><input type="text" id="ncTel"></div>
+        <div class="campo"><label>Email</label><input type="email" id="ncEmail"></div>
+        <div class="campo" style="grid-column:span 2;"><label>Dirección</label><input type="text" id="ncDir"></div>
+      </div>
+
+      <div class="nc-subtit">Datos del evento</div>
+      <div class="nc-grid">
+        <div class="campo"><label>Fecha boda</label><input type="date" id="ncFecha"></div>
+        <div class="campo"><label>Hora</label><input type="time" id="ncHora"></div>
+        <div class="campo"><label>Lugar evento</label><input type="text" id="ncLugar"></div>
+        <div class="campo"><label>Dir. servicio</label><input type="text" id="ncDirSrv"></div>
+        <div class="campo"><label>2ª dirección</label><input type="text" id="ncDirSrv2"></div>
+        <div class="campo">
+          <label>Zona de desplazamiento</label>
+          <select id="ncZona"></select>
+        </div>
+      </div>
+
+      <div class="nc-subtit">Servicios novia</div>
+      <div class="nc-chk-list" id="ncServiciosNovia"></div>
+      <div class="nc-subtit">Combinados</div>
+      <div class="nc-chk-list" id="ncCombinados"></div>
+
+      <div class="nc-subtit">Invitadas</div>
+      <div id="ncInvitadas"></div>
+      <button class="btn-add" id="btnNcAddInv" type="button">+ Añadir invitada</button>
+
+      <div class="nc-subtit">Beauty Corner</div>
+      <div class="nc-grid">
+        <div class="campo"><label><input type="checkbox" id="ncBcOn"> Activar</label></div>
+        <div class="campo"><label>Hotel/espacio</label><input type="text" id="ncBcHotel"></div>
+        <div class="campo"><label>Dirección</label><input type="text" id="ncBcDir"></div>
+        <div class="campo" style="grid-column:span 3;"><label>Notas</label><input type="text" id="ncBcNotas"></div>
+      </div>
+
+      <div class="nc-subtit">Descuento comercial</div>
+      <div class="nc-grid" style="grid-template-columns:200px;">
+        <div class="campo"><label>Descuento (%)</label><input type="number" id="ncDescuentoPct" min="0" max="100" step="1" value="0"></div>
+      </div>
+
+      <div class="nc-resumen" id="ncResumen"><div class="ln">Selecciona servicios para ver el presupuesto</div></div>
+
+      <button class="btn-guardar" id="btnGenerarEnlace" type="button">Generar enlace de firma</button>
+
+      <div class="nc-resultado hidden" id="ncResultado">
+        <strong>Enlace generado:</strong>
+        <input type="text" id="ncLink" readonly>
+        <button class="btn-add" id="btnCopiarLink" type="button">Copiar enlace</button>
+      </div>
     </section>
   </main>
 </div>
@@ -328,11 +405,255 @@ function cargarPrecios(){
         ? 'Origen: Google Sheet' + (j.updatedAt ? ' · última actualización ' + fmtFecha(j.updatedAt) : '')
         : 'Origen: valores por defecto (aún no se ha guardado ningún precio desde este panel)';
       pintarPrecios(PRECIOS_ACTUALES);
+      if(!NC_INICIALIZADO){ initNuevoContrato(); NC_INICIALIZADO = true; }
     })
     .catch(function(err){
       document.getElementById('preciosWrap').innerHTML = '<div class="estado-vacio">Error de conexión: '+err.message+'</div>';
     });
 }
+
+// =================== NUEVO CONTRATO (enlace de firma) ===================
+// Duplica a propósito el cálculo trivial de calcDesp()/calcDto() de
+// index.html: no merece extraerse a un archivo compartido (~10 líneas).
+var NC_INICIALIZADO = false;
+var EST_NC = { invs: [], nc: 0 };
+
+function initNuevoContrato(){
+  var gNov = document.getElementById('ncServiciosNovia');
+  gNov.innerHTML = '';
+  PRECIOS_ACTUALES.serviciosNovia.forEach(function(s, i){
+    gNov.innerHTML += '<label class="nc-chk-row"><input type="checkbox" class="nc-srv-novia" value="'+i+'"> '+s.nom+' — '+s.pre+' €</label>';
+  });
+
+  var gComb = document.getElementById('ncCombinados');
+  gComb.innerHTML = '';
+  PRECIOS_ACTUALES.combinadosNovia.forEach(function(s, i){
+    gComb.innerHTML += '<label class="nc-chk-row"><input type="checkbox" class="nc-comb" value="'+i+'"> '+s.nom+' — '+s.pre+' €</label>';
+  });
+
+  var selZona = document.getElementById('ncZona');
+  selZona.innerHTML = '';
+  PRECIOS_ACTUALES.zonas.forEach(function(z, i){
+    selZona.innerHTML += '<option value="'+i+'">'+z.et+' — '+z.nm+' ('+z.pre+' €)</option>';
+  });
+
+  document.querySelectorAll('#ncServiciosNovia input,#ncCombinados input').forEach(function(el){
+    el.addEventListener('change', actualizarResumenNC);
+  });
+  document.getElementById('ncZona').addEventListener('change', actualizarResumenNC);
+  document.getElementById('ncDescuentoPct').addEventListener('input', actualizarResumenNC);
+  document.getElementById('ncBcOn').addEventListener('change', function(){
+    var on = this.checked;
+    ['ncBcHotel','ncBcDir','ncBcNotas'].forEach(function(id){ document.getElementById(id).disabled = !on; });
+  });
+
+  actualizarResumenNC();
+}
+
+function ncAddInv(){
+  var id = ++EST_NC.nc;
+  EST_NC.invs.push({ id: id, nom: '', srvSel: new Set() });
+
+  var row = document.createElement('div');
+  row.className = 'nc-inv-row';
+
+  var nomInput = document.createElement('input');
+  nomInput.type = 'text';
+  nomInput.placeholder = 'Nombre / Relación';
+  nomInput.addEventListener('input', function(){
+    var inv = EST_NC.invs.find(function(x){ return x.id === id; });
+    if(inv) inv.nom = nomInput.value;
+  });
+  row.appendChild(nomInput);
+
+  var chkList = document.createElement('div');
+  chkList.className = 'nc-chk-list';
+  PRECIOS_ACTUALES.serviciosInv.forEach(function(s, i){
+    var lbl = document.createElement('label');
+    lbl.className = 'nc-chk-row';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.addEventListener('change', function(){
+      var inv = EST_NC.invs.find(function(x){ return x.id === id; });
+      if(!inv) return;
+      if(cb.checked) inv.srvSel.add(i); else inv.srvSel.delete(i);
+      actualizarResumenNC();
+    });
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(' ' + s.nom + ' — ' + s.pre + ' €'));
+    chkList.appendChild(lbl);
+  });
+  row.appendChild(chkList);
+
+  var btnRm = document.createElement('button');
+  btnRm.type = 'button';
+  btnRm.className = 'btn-rm';
+  btnRm.textContent = '✕ Quitar';
+  btnRm.addEventListener('click', function(){
+    EST_NC.invs = EST_NC.invs.filter(function(x){ return x.id !== id; });
+    row.remove();
+    actualizarResumenNC();
+  });
+  row.appendChild(btnRm);
+
+  document.getElementById('ncInvitadas').appendChild(row);
+  actualizarResumenNC();
+}
+document.getElementById('btnNcAddInv').addEventListener('click', ncAddInv);
+
+function calcDespNC(zonaIdx){
+  var z = PRECIOS_ACTUALES.zonas[zonaIdx];
+  if(!z || z.pre === 0) return { pre: 0, pct: 0 };
+  var n = EST_NC.invs.length, pct = 0;
+  if(z.bonif){ if(n >= 6) pct = z.bonif.t; else if(n >= 3) pct = z.bonif.m; }
+  var desc = Math.round(z.pre * pct / 100);
+  return { pre: z.pre - desc, pct: pct };
+}
+
+function ncSeleccion(){
+  var idxNov = Array.from(document.querySelectorAll('.nc-srv-novia:checked')).map(function(el){ return Number(el.value); });
+  var idxComb = Array.from(document.querySelectorAll('.nc-comb:checked')).map(function(el){ return Number(el.value); });
+  var linNov = idxNov.map(function(i){ return PRECIOS_ACTUALES.serviciosNovia[i]; });
+  var linComb = idxComb.map(function(i){ return PRECIOS_ACTUALES.combinadosNovia[i]; });
+  return { linNov: linNov, linComb: linComb };
+}
+
+function actualizarResumenNC(){
+  var sel = ncSeleccion();
+  var totNov = sel.linNov.reduce(function(s,x){ return s+x.pre; }, 0);
+  var totComb = sel.linComb.reduce(function(s,x){ return s+x.pre; }, 0);
+  var totInv = EST_NC.invs.reduce(function(s,inv){
+    return s + Array.from(inv.srvSel).reduce(function(a,i){ return a + PRECIOS_ACTUALES.serviciosInv[i].pre; }, 0);
+  }, 0);
+  var zonaIdx = Number(document.getElementById('ncZona').value || 0);
+  var d = calcDespNC(zonaIdx);
+  var dtoPct = Number(document.getElementById('ncDescuentoPct').value) || 0;
+  var subtotalServ = totNov + totComb + totInv;
+  var dtoImporte = Math.round(subtotalServ * dtoPct / 100 * 100) / 100;
+  var tot = subtotalServ - dtoImporte + d.pre;
+  var dep = (tot * 0.25).toFixed(2);
+
+  var el = document.getElementById('ncResumen');
+  if(sel.linNov.length === 0 && sel.linComb.length === 0 && totInv === 0 && d.pre === 0){
+    el.innerHTML = '<div class="ln">Selecciona servicios para ver el presupuesto</div>';
+    return;
+  }
+  var h = '';
+  sel.linNov.concat(sel.linComb).forEach(function(s){ h += '<div class="ln"><span>'+s.nom+'</span><span>'+s.pre+' €</span></div>'; });
+  if(totInv > 0) h += '<div class="ln"><span>Invitadas</span><span>'+totInv+' €</span></div>';
+  if(dtoPct > 0) h += '<div class="ln"><span>Descuento comercial ('+dtoPct+'%)</span><span>−'+dtoImporte.toFixed(2)+' €</span></div>';
+  if(d.pre > 0) h += '<div class="ln"><span>Desplazamiento'+(d.pct>0?' (bonif. '+d.pct+'%)':'')+'</span><span>'+d.pre+' €</span></div>';
+  h += '<div class="ln tot"><span>Total estimado</span><span>'+tot.toFixed(2)+' €</span></div>';
+  h += '<div class="ln"><span>Depósito (25%)</span><span>'+dep+' €</span></div>';
+  el.innerHTML = h;
+}
+
+document.getElementById('btnGenerarEnlace').addEventListener('click', function(){
+  var nombre = document.getElementById('ncNombre').value.trim();
+  var dni = document.getElementById('ncDni').value.trim();
+  var tel = document.getElementById('ncTel').value.trim();
+  var email = document.getElementById('ncEmail').value.trim();
+  var fecha = document.getElementById('ncFecha').value;
+  var dirSrv = document.getElementById('ncDirSrv').value.trim();
+  var msg = document.getElementById('msgTop');
+
+  var sel = ncSeleccion();
+  if(!nombre || !dni || !tel || !email || !fecha || !dirSrv){
+    msg.className = 'msg-top err';
+    msg.textContent = 'Rellena nombre, DNI, teléfono, email, fecha de boda y dirección del servicio.';
+    msg.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  if(sel.linNov.length === 0){
+    msg.className = 'msg-top err';
+    msg.textContent = 'Selecciona al menos un servicio para la novia.';
+    msg.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+
+  var zonaIdx = Number(document.getElementById('ncZona').value || 0);
+  var d = calcDespNC(zonaIdx);
+  var dtoPct = Number(document.getElementById('ncDescuentoPct').value) || 0;
+  var totNov = sel.linNov.reduce(function(s,x){ return s+x.pre; }, 0);
+  var totComb = sel.linComb.reduce(function(s,x){ return s+x.pre; }, 0);
+  var totInv = EST_NC.invs.reduce(function(s,inv){
+    return s + Array.from(inv.srvSel).reduce(function(a,i){ return a + PRECIOS_ACTUALES.serviciosInv[i].pre; }, 0);
+  }, 0);
+  var subtotalServ = totNov + totComb + totInv;
+  var dtoImporte = Math.round(subtotalServ * dtoPct / 100 * 100) / 100;
+  var tot = subtotalServ - dtoImporte + d.pre;
+  var dep = (tot * 0.25).toFixed(2);
+  var bcOn = document.getElementById('ncBcOn').checked;
+  var fechaFmt = fecha ? new Date(fecha+'T12:00:00').toLocaleDateString('es-ES') : '';
+
+  var formData = {
+    nombre: nombre, dni: dni, tel: tel, email: email, dir: document.getElementById('ncDir').value.trim(),
+    fecha: fecha, fechaFmt: fechaFmt, hora: document.getElementById('ncHora').value,
+    lugar: document.getElementById('ncLugar').value.trim(), dirSrv: dirSrv,
+    dirSrv2: document.getElementById('ncDirSrv2').value.trim(),
+    serviciosNovia: sel.linNov.map(function(s){ return s.nom+': '+s.pre+' €'; }),
+    combinados: sel.linComb.map(function(s){ return s.nom+': '+s.pre+' €'; }),
+    invitadas: EST_NC.invs.filter(function(inv){ return inv.srvSel.size > 0; }).map(function(inv){
+      var srvs = Array.from(inv.srvSel).map(function(i){ return PRECIOS_ACTUALES.serviciosInv[i].nom; }).join(' + ');
+      var t = Array.from(inv.srvSel).reduce(function(a,i){ return a + PRECIOS_ACTUALES.serviciosInv[i].pre; }, 0);
+      return (inv.nom || 'Invitada') + ': ' + srvs + ' — ' + t + ' €';
+    }),
+    zona: PRECIOS_ACTUALES.zonas[zonaIdx].nm,
+    desplazamiento: d.pre,
+    beautyCorner: bcOn ? {
+      hotel: document.getElementById('ncBcHotel').value.trim(),
+      dir: document.getElementById('ncBcDir').value.trim(),
+      notas: document.getElementById('ncBcNotas').value.trim()
+    } : null,
+    subtotalNovia: totNov + totComb,
+    subtotalInvitadas: totInv,
+    descuentoPct: dtoPct,
+    descuentoImporte: dtoImporte,
+    total: tot,
+    deposito: dep
+  };
+
+  var btn = this;
+  btn.disabled = true; btn.textContent = 'Generando…';
+
+  fetch('/api/create-pending', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': getPassword() },
+    body: JSON.stringify({ formData: formData })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    btn.disabled = false; btn.textContent = 'Generar enlace de firma';
+    if(j.ok){
+      document.getElementById('ncLink').value = j.link;
+      document.getElementById('ncResultado').classList.remove('hidden');
+      msg.className = 'msg-top ok';
+      msg.textContent = '✓ Enlace generado. Cópialo y envíaselo a la clienta.';
+    } else {
+      msg.className = 'msg-top err';
+      msg.textContent = 'Error generando el enlace: ' + (j.error || '');
+    }
+    msg.scrollIntoView({behavior:'smooth', block:'center'});
+  })
+  .catch(function(err){
+    btn.disabled = false; btn.textContent = 'Generar enlace de firma';
+    msg.className = 'msg-top err';
+    msg.textContent = 'Error de conexión: ' + err.message;
+    msg.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+});
+
+document.getElementById('btnCopiarLink').addEventListener('click', function(){
+  var input = document.getElementById('ncLink');
+  navigator.clipboard.writeText(input.value).then(function(){
+    var btn = document.getElementById('btnCopiarLink');
+    var textoOriginal = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    setTimeout(function(){ btn.textContent = textoOriginal; }, 1500);
+  }).catch(function(){
+    input.select();
+  });
+});
 
 function filaPrecio(item, path, extra){
   return '<div class="precio-fila" data-path="'+path+'">'
