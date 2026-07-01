@@ -758,6 +758,7 @@ function generarContrato(){
     descuentoImporte: dtoImporte,
     total: tot,
     deposito: dep,
+    firma: firmaDataURL,
     timestamp: new Date().toISOString()
   };
 
@@ -973,10 +974,39 @@ window.addEventListener('DOMContentLoaded', function(){
     document.getElementById('bcDet').classList.toggle('vis', this.checked);
   });
   document.getElementById('btnAddInv').addEventListener('click', addInv);
-  initNovia();
-  initZonas();
-  actualizarResumen();
+  cargarPreciosYArrancar();
 });
+
+// =================== PRECIOS DINÁMICOS ===================
+// Intenta cargar los precios actuales desde el admin (/api/prices).
+// Si falla o tarda demasiado, arranca con los valores locales de CFG
+// para que el formulario nunca se quede bloqueado por una caída del
+// backend o del Google Sheet.
+function cargarPreciosYArrancar(){
+  var controller = new AbortController();
+  var timeout = setTimeout(function(){ controller.abort(); }, 2500);
+  fetch('/api/prices', { signal: controller.signal })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.precios) aplicarPrecios(data.precios);
+    })
+    .catch(function(err){
+      console.warn('[Precios] No se pudieron cargar desde el servidor, usando valores locales:', err);
+    })
+    .finally(function(){
+      clearTimeout(timeout);
+      initNovia();
+      initZonas();
+      actualizarResumen();
+    });
+}
+
+function aplicarPrecios(p){
+  if(Array.isArray(p.serviciosNovia) && p.serviciosNovia.length) CFG.serviciosNovia = p.serviciosNovia;
+  if(Array.isArray(p.combinadosNovia)) CFG.combinadosNovia = p.combinadosNovia;
+  if(Array.isArray(p.serviciosInv) && p.serviciosInv.length) CFG.serviciosInv = p.serviciosInv;
+  if(Array.isArray(p.zonas) && p.zonas.length) CFG.zonas = p.zonas;
+}
 
 </script>
 </body>
