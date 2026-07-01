@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de administración — Inés Sánchez Beauty Concept</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600&family=Jost:wght@300;400;500&display=swap');
+:root{--negro:#1a1410;--dorado:#b8972a;--dorado-claro:#d4af37;--crema:#faf7f2;--crema-o:#f0ebe1;--gris:#7a6f65;--borde:#ddd5c8;--ok:#1a7a3a;--err:#c0392b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Jost',sans-serif;background:var(--crema);color:var(--negro);min-height:100vh;}
+.hidden{display:none!important;}
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-box{background:#fff;border-radius:8px;padding:40px 36px;box-shadow:0 4px 24px rgba(0,0,0,.08);max-width:360px;width:100%;text-align:center;}
+.login-box h1{font-family:'Cormorant Garamond',serif;font-size:1.4rem;letter-spacing:.08em;margin-bottom:4px;}
+.login-box .sub{font-size:.7rem;color:var(--gris);letter-spacing:.15em;text-transform:uppercase;margin-bottom:24px;}
+.login-box input{width:100%;border:1px solid var(--borde);padding:12px 14px;border-radius:5px;font-size:.9rem;margin-bottom:12px;font-family:'Jost',sans-serif;}
+.login-box button{width:100%;padding:13px;background:var(--negro);color:#fff;border:none;border-radius:5px;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
+.login-box button:hover{background:var(--dorado);}
+.login-err{color:var(--err);font-size:.8rem;margin-top:10px;min-height:1.2em;}
+/* SHELL */
+header.top{background:var(--negro);color:#fff;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;}
+header.top .tit{font-family:'Cormorant Garamond',serif;font-size:1.15rem;letter-spacing:.1em;}
+header.top .tit span{color:var(--dorado-claro);}
+header.top button{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:4px;font-size:.75rem;letter-spacing:.08em;cursor:pointer;}
+header.top button:hover{border-color:var(--dorado-claro);color:var(--dorado-claro);}
+main{max-width:1200px;margin:0 auto;padding:28px 24px 60px;}
+.card{background:#fff;border-radius:8px;padding:22px 24px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.card h2{font-family:'Cormorant Garamond',serif;font-size:1.15rem;letter-spacing:.05em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--borde);}
+.filtros{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;}
+.filtros .campo{display:flex;flex-direction:column;gap:4px;}
+.filtros label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);}
+.filtros input,.filtros select{border:1px solid var(--borde);padding:8px 10px;border-radius:4px;font-family:'Jost',sans-serif;font-size:.85rem;}
+.filtros button{padding:9px 16px;background:var(--crema-o);border:1px solid var(--borde);border-radius:4px;font-size:.78rem;cursor:pointer;}
+.filtros button:hover{border-color:var(--dorado);}
+table.tbl{width:100%;border-collapse:collapse;font-size:.83rem;}
+table.tbl th{text-align:left;padding:9px 10px;background:var(--crema-o);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);border-bottom:1px solid var(--borde);white-space:nowrap;}
+table.tbl td{padding:9px 10px;border-bottom:1px solid var(--borde);vertical-align:top;}
+table.tbl tr:hover td{background:#fbf9f5;}
+.badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:.7rem;font-weight:500;}
+.badge.si{background:#eafaf0;color:var(--ok);}
+.badge.no{background:#faf0f0;color:var(--err);}
+.estado-vacio{padding:30px;text-align:center;color:var(--gris);font-style:italic;}
+.btn-enviar{background:var(--dorado);color:#fff;border:none;padding:7px 12px;border-radius:4px;font-size:.75rem;cursor:pointer;white-space:nowrap;}
+.btn-enviar:hover:not(:disabled){background:var(--dorado-claro);}
+.btn-enviar:disabled{background:var(--borde);cursor:not-allowed;}
+.msg-top{padding:10px 14px;border-radius:5px;font-size:.82rem;margin-bottom:14px;display:none;}
+.msg-top.err{background:#fdf0f0;border:1px solid #f0c0c0;color:var(--err);display:block;}
+.msg-top.ok{background:#f0fdf4;border:1px solid #a8e0b8;color:var(--ok);display:block;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <h1>INÉS SÁNCHEZ</h1>
+    <div class="sub">Panel de administración</div>
+    <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+    <button id="btnLogin" type="button">Entrar</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div id="dashboard" class="hidden">
+  <header class="top">
+    <div class="tit">INÉS SÁNCHEZ <span>· ADMIN</span></div>
+    <button id="btnLogout" type="button">Cerrar sesión</button>
+  </header>
+  <main>
+    <div id="msgTop" class="msg-top"></div>
+
+    <section class="card">
+      <h2>Contratos recibidos</h2>
+      <div class="filtros">
+        <div class="campo">
+          <label>Boda desde</label>
+          <input type="date" id="fDesde">
+        </div>
+        <div class="campo">
+          <label>Boda hasta</label>
+          <input type="date" id="fHasta">
+        </div>
+        <div class="campo">
+          <label>PDF enviado</label>
+          <select id="fEstado">
+            <option value="">Todos</option>
+            <option value="si">Enviado</option>
+            <option value="no">No enviado</option>
+          </select>
+        </div>
+        <button id="btnFiltrar" type="button">Filtrar</button>
+        <button id="btnRecargar" type="button">Recargar</button>
+      </div>
+      <div id="tablaWrap"><div class="estado-vacio">Cargando contratos…</div></div>
+    </section>
+  </main>
+</div>
+
+<script>
+var API_CONTRACTS = '/api/contracts';
+var ALL_ROWS = [];
+
+function getPassword(){ return localStorage.getItem('adminPassword') || ''; }
+function setPassword(p){ localStorage.setItem('adminPassword', p); }
+function clearPassword(){ localStorage.removeItem('adminPassword'); }
+
+function showLogin(errMsg){
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginErr').textContent = errMsg || '';
+}
+function showDashboard(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+}
+
+function intentarLogin(password){
+  return fetch(API_CONTRACTS, { headers: { 'X-Admin-Password': password } })
+    .then(function(r){
+      if(r.status === 401) return { ok:false, unauthorized:true };
+      return r.json().then(function(j){ j._status = r.status; return j; });
+    });
+}
+
+document.getElementById('btnLogin').addEventListener('click', function(){
+  var pass = document.getElementById('loginPassword').value;
+  if(!pass) return;
+  var btn = this; btn.disabled = true; btn.textContent = 'Comprobando…';
+  intentarLogin(pass).then(function(j){
+    btn.disabled = false; btn.textContent = 'Entrar';
+    if(j.unauthorized){
+      document.getElementById('loginErr').textContent = 'Contraseña incorrecta.';
+      return;
+    }
+    if(!j.ok){
+      document.getElementById('loginErr').textContent = 'Error: ' + (j.error || 'no se pudo conectar');
+      return;
+    }
+    setPassword(pass);
+    showDashboard();
+    pintarContratos(j.rows || []);
+  }).catch(function(err){
+    btn.disabled = false; btn.textContent = 'Entrar';
+    document.getElementById('loginErr').textContent = 'Error de conexión: ' + err.message;
+  });
+});
+
+document.getElementById('loginPassword').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('btnLogin').click();
+});
+
+document.getElementById('btnLogout').addEventListener('click', function(){
+  clearPassword();
+  showLogin();
+});
+
+function cargarContratos(){
+  document.getElementById('tablaWrap').innerHTML = '<div class="estado-vacio">Cargando contratos…</div>';
+  intentarLogin(getPassword()).then(function(j){
+    if(j.unauthorized){ clearPassword(); showLogin('Tu sesión ha caducado, vuelve a entrar.'); return; }
+    if(!j.ok){
+      document.getElementById('tablaWrap').innerHTML = '<div class="estado-vacio">Error cargando contratos: '+(j.error||'')+'</div>';
+      return;
+    }
+    ALL_ROWS = j.rows || [];
+    pintarContratos(ALL_ROWS);
+  }).catch(function(err){
+    document.getElementById('tablaWrap').innerHTML = '<div class="estado-vacio">Error de conexión: '+err.message+'</div>';
+  });
+}
+
+function fmtFecha(v){
+  if(!v) return '—';
+  var d = new Date(v);
+  if(isNaN(d.getTime())) return String(v);
+  return d.toLocaleDateString('es-ES');
+}
+
+function pintarContratos(rows){
+  if(!rows.length){
+    document.getElementById('tablaWrap').innerHTML = '<div class="estado-vacio">No hay contratos que coincidan con el filtro.</div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr>'
+    + '<th>Novia</th><th>Fecha boda</th><th>Servicios</th><th>Total</th><th>Fecha registro</th><th>PDF enviado</th><th></th>'
+    + '</tr></thead><tbody>';
+  rows.forEach(function(row){
+    var servicios = [].concat(row['Servicios novia']||[], row['Combinados']||[]);
+    var serviciosTxt = Array.isArray(servicios) ? servicios.join(', ') : String(servicios||'');
+    if(!serviciosTxt && typeof row['Servicios novia'] === 'string') serviciosTxt = row['Servicios novia'];
+    var enviado = row['PDF enviado'] === 'Sí';
+    html += '<tr>'
+      + '<td>'+(row['Nombre']||'—')+'<br><span style="color:var(--gris);font-size:.78rem;">'+(row['Email']||'')+'</span></td>'
+      + '<td>'+fmtFecha(row['Fecha boda'])+'</td>'
+      + '<td style="max-width:260px;">'+(serviciosTxt||'—')+'</td>'
+      + '<td>'+(row['Total (€)']!=null?row['Total (€)']+' €':'—')+'</td>'
+      + '<td>'+fmtFecha(row['Fecha registro'])+'</td>'
+      + '<td>'+(enviado
+          ? '<span class="badge si">Sí — '+fmtFecha(row['Fecha envío PDF'])+'</span>'
+          : '<span class="badge no">No</span>')+'</td>'
+      + '<td><button class="btn-enviar" disabled title="Disponible próximamente">Enviar contrato</button></td>'
+      + '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('tablaWrap').innerHTML = html;
+}
+
+function aplicarFiltros(){
+  var desde = document.getElementById('fDesde').value;
+  var hasta = document.getElementById('fHasta').value;
+  var estado = document.getElementById('fEstado').value;
+  var filtradas = ALL_ROWS.filter(function(row){
+    if(desde || hasta){
+      var f = new Date(row['Fecha boda']);
+      if(isNaN(f.getTime())) return false;
+      if(desde && f < new Date(desde)) return false;
+      if(hasta && f > new Date(hasta+'T23:59:59')) return false;
+    }
+    if(estado === 'si' && row['PDF enviado'] !== 'Sí') return false;
+    if(estado === 'no' && row['PDF enviado'] === 'Sí') return false;
+    return true;
+  });
+  pintarContratos(filtradas);
+}
+
+document.getElementById('btnFiltrar').addEventListener('click', aplicarFiltros);
+document.getElementById('btnRecargar').addEventListener('click', cargarContratos);
+
+// ---- Arranque ----
+(function(){
+  var saved = getPassword();
+  if(!saved){ showLogin(); return; }
+  intentarLogin(saved).then(function(j){
+    if(j.unauthorized){ clearPassword(); showLogin(); return; }
+    if(!j.ok){ showLogin('Error: '+(j.error||'no se pudo conectar')); return; }
+    showDashboard();
+    ALL_ROWS = j.rows || [];
+    pintarContratos(ALL_ROWS);
+  }).catch(function(){
+    showLogin('Error de conexión.');
+  });
+})();
+</script>
+</body>
+</html>
