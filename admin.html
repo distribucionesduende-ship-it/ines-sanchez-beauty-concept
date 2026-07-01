@@ -48,6 +48,19 @@ table.tbl tr:hover td{background:#fbf9f5;}
 .msg-top{padding:10px 14px;border-radius:5px;font-size:.82rem;margin-bottom:14px;display:none;}
 .msg-top.err{background:#fdf0f0;border:1px solid #f0c0c0;color:var(--err);display:block;}
 .msg-top.ok{background:#f0fdf4;border:1px solid #a8e0b8;color:var(--ok);display:block;}
+/* PRECIOS */
+.precios-grupo{margin-bottom:20px;}
+.precios-grupo h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gris);margin-bottom:10px;}
+.precio-fila{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--crema-o);}
+.precio-fila .nom{flex:1;font-size:.86rem;}
+.precio-fila .nom .desc{display:block;font-size:.75rem;color:var(--gris);margin-top:2px;}
+.precio-fila .campo-pre{display:flex;align-items:center;gap:5px;}
+.precio-fila input[type=number]{width:80px;border:1px solid var(--borde);padding:7px 8px;border-radius:4px;font-family:'Jost',sans-serif;font-size:.85rem;text-align:right;}
+.precio-fila .campo-pre span{font-size:.8rem;color:var(--gris);}
+.precios-fuente{font-size:.75rem;color:var(--gris);margin-bottom:14px;}
+.btn-guardar{background:var(--negro);color:#fff;border:none;padding:11px 22px;border-radius:5px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-top:8px;}
+.btn-guardar:hover:not(:disabled){background:var(--dorado);}
+.btn-guardar:disabled{background:var(--borde);cursor:not-allowed;}
 </style>
 </head>
 <body>
@@ -94,6 +107,13 @@ table.tbl tr:hover td{background:#fbf9f5;}
       </div>
       <div id="tablaWrap"><div class="estado-vacio">Cargando contratos…</div></div>
     </section>
+
+    <section class="card">
+      <h2>Precios</h2>
+      <div class="precios-fuente" id="preciosFuente"></div>
+      <div id="preciosWrap"><div class="estado-vacio">Cargando precios…</div></div>
+      <button class="btn-guardar" id="btnGuardarPrecios" type="button">Guardar precios</button>
+    </section>
   </main>
 </div>
 
@@ -139,7 +159,9 @@ document.getElementById('btnLogin').addEventListener('click', function(){
     }
     setPassword(pass);
     showDashboard();
-    pintarContratos(j.rows || []);
+    ALL_ROWS = j.rows || [];
+    pintarContratos(ALL_ROWS);
+    cargarPrecios();
   }).catch(function(err){
     btn.disabled = false; btn.textContent = 'Entrar';
     document.getElementById('loginErr').textContent = 'Error de conexión: ' + err.message;
@@ -227,6 +249,112 @@ function aplicarFiltros(){
 document.getElementById('btnFiltrar').addEventListener('click', aplicarFiltros);
 document.getElementById('btnRecargar').addEventListener('click', cargarContratos);
 
+// =================== PRECIOS ===================
+var PRECIOS_ACTUALES = null;
+
+function cargarPrecios(){
+  document.getElementById('preciosWrap').innerHTML = '<div class="estado-vacio">Cargando precios…</div>';
+  fetch('/api/prices')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(!j.ok || !j.precios){
+        document.getElementById('preciosWrap').innerHTML = '<div class="estado-vacio">No se pudieron cargar los precios.</div>';
+        return;
+      }
+      PRECIOS_ACTUALES = j.precios;
+      document.getElementById('preciosFuente').textContent = j.source === 'sheet'
+        ? 'Origen: Google Sheet' + (j.updatedAt ? ' · última actualización ' + fmtFecha(j.updatedAt) : '')
+        : 'Origen: valores por defecto (aún no se ha guardado ningún precio desde este panel)';
+      pintarPrecios(PRECIOS_ACTUALES);
+    })
+    .catch(function(err){
+      document.getElementById('preciosWrap').innerHTML = '<div class="estado-vacio">Error de conexión: '+err.message+'</div>';
+    });
+}
+
+function filaPrecio(item, path, extra){
+  return '<div class="precio-fila" data-path="'+path+'">'
+    + '<div class="nom">'+item.nom+(item.desc?'<span class="desc">'+item.desc+'</span>':'')+'</div>'
+    + '<div class="campo-pre"><input type="number" step="1" min="0" class="input-pre" value="'+item.pre+'"><span>€</span></div>'
+    + (extra || '')
+    + '</div>';
+}
+
+function pintarPrecios(p){
+  var html = '';
+
+  html += '<div class="precios-grupo"><h3>Servicios novia</h3>';
+  p.serviciosNovia.forEach(function(item, i){ html += filaPrecio(item, 'serviciosNovia.'+i); });
+  html += '</div>';
+
+  html += '<div class="precios-grupo"><h3>Combinados novia</h3>';
+  p.combinadosNovia.forEach(function(item, i){ html += filaPrecio(item, 'combinadosNovia.'+i); });
+  html += '</div>';
+
+  html += '<div class="precios-grupo"><h3>Servicios invitadas</h3>';
+  p.serviciosInv.forEach(function(item, i){ html += filaPrecio(item, 'serviciosInv.'+i); });
+  html += '</div>';
+
+  html += '<div class="precios-grupo"><h3>Zonas de desplazamiento</h3>';
+  p.zonas.forEach(function(item, i){
+    var extra = '';
+    if(item.bonif){
+      extra = '<div class="campo-pre"><input type="number" step="1" min="0" class="input-bonif-m" value="'+item.bonif.m+'"><span>% (3–5 extras)</span></div>'
+        + '<div class="campo-pre"><input type="number" step="1" min="0" class="input-bonif-t" value="'+item.bonif.t+'"><span>% (6+)</span></div>';
+    }
+    html += filaPrecio({ nom: item.et + ' — ' + item.nm, pre: item.pre }, 'zonas.'+i, extra);
+  });
+  html += '</div>';
+
+  document.getElementById('preciosWrap').innerHTML = html;
+}
+
+document.getElementById('btnGuardarPrecios').addEventListener('click', function(){
+  if(!PRECIOS_ACTUALES) return;
+  var btn = this; btn.disabled = true; btn.textContent = 'Guardando…';
+
+  var filas = document.querySelectorAll('#preciosWrap .precio-fila');
+  filas.forEach(function(fila){
+    var path = fila.getAttribute('data-path').split('.');
+    var grupo = path[0], idx = Number(path[1]);
+    var pre = Number(fila.querySelector('.input-pre').value) || 0;
+    if(grupo === 'zonas'){
+      PRECIOS_ACTUALES.zonas[idx].pre = pre;
+      var im = fila.querySelector('.input-bonif-m');
+      var it = fila.querySelector('.input-bonif-t');
+      if(im && it) PRECIOS_ACTUALES.zonas[idx].bonif = { m: Number(im.value)||0, t: Number(it.value)||0 };
+    } else {
+      PRECIOS_ACTUALES[grupo][idx].pre = pre;
+    }
+  });
+
+  fetch('/api/prices', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': getPassword() },
+    body: JSON.stringify({ precios: PRECIOS_ACTUALES })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    btn.disabled = false; btn.textContent = 'Guardar precios';
+    var msg = document.getElementById('msgTop');
+    if(j.ok){
+      msg.className = 'msg-top ok';
+      msg.textContent = '✓ Precios guardados. El formulario público los reflejará en su próxima carga.';
+      cargarPrecios();
+    } else {
+      msg.className = 'msg-top err';
+      msg.textContent = 'Error guardando precios: ' + (j.error || '');
+    }
+    msg.scrollIntoView({behavior:'smooth', block:'center'});
+  })
+  .catch(function(err){
+    btn.disabled = false; btn.textContent = 'Guardar precios';
+    var msg = document.getElementById('msgTop');
+    msg.className = 'msg-top err';
+    msg.textContent = 'Error de conexión: ' + err.message;
+  });
+});
+
 // ---- Arranque ----
 (function(){
   var saved = getPassword();
@@ -237,6 +365,7 @@ document.getElementById('btnRecargar').addEventListener('click', cargarContratos
     showDashboard();
     ALL_ROWS = j.rows || [];
     pintarContratos(ALL_ROWS);
+    cargarPrecios();
   }).catch(function(){
     showLogin('Error de conexión.');
   });
