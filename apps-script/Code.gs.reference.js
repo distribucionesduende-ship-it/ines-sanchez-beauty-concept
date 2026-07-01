@@ -2,29 +2,33 @@
  * Code.gs.reference.js — REFERENCIA, no se ejecuta desde este repo.
  *
  * Cómo aplicar:
- * 1. Abre el Google Sheet de contratos > Extensiones > Apps Script.
- * 2. Copia TODO tu código actual del doPost dentro de la función
- *    legacyLogContract(d) de más abajo, tal cual está hoy (sin cambiarlo),
- *    salvo por UNA línea nueva: añade d.firma al final del appendRow
- *    (ver comentario dentro de legacyLogContract) y añade la columna
- *    "Firma" en la fila de cabecera del Sheet.
- * 3. Ajusta SHEET_CONTRATOS al nombre real de tu pestaña de contratos.
- * 4. Genera un SECRET_TOKEN largo y aleatorio, y ponlo aquí Y en la
+ * 1. Abre el Google Sheet de contratos ("Inés Sánchez — Contratos") >
+ *    Extensiones > Apps Script.
+ * 2. Sustituye TODO el contenido actual por este archivo.
+ * 3. Genera un SECRET_TOKEN largo y aleatorio, y ponlo aquí Y en la
  *    variable de entorno APPS_SCRIPT_TOKEN de Vercel (deben coincidir).
- * 5. IMPORTANTE: prueba todo esto primero sobre una COPIA del Sheet
- *    (Archivo > Crear una copia) con un despliegue de Web App nuevo,
- *    antes de tocar el documento real con datos de novias.
- * 6. Vuelve a desplegar el Web App (Implementar > Administrar
+ * 4. IMPORTANTE: prueba primero sobre una COPIA del Sheet (Archivo >
+ *    Crear una copia) con un despliegue de Web App nuevo, antes de
+ *    tocar el documento real con datos de novias.
+ * 5. Vuelve a desplegar el Web App (Implementar > Administrar
  *    implementaciones > Editar > Nueva versión) para que los cambios
  *    de doGet/doPost tengan efecto. La URL del Web App no cambia.
  *
  * Compatibilidad: las peticiones existentes desde api/send-email.js
- * (POST sin campo "action") siguen cayendo en legacyLogContract sin
- * ningún cambio de comportamiento.
+ * (POST sin campo "action") siguen cayendo en legacyLogContract, que
+ * reproduce el doPost original tal cual, solo añadiendo la firma como
+ * última columna.
+ *
+ * Nota sobre la pestaña: legacyLogContract usaba antes
+ * getActiveSheet(), que en un Web App no siempre apunta de forma
+ * fiable a la pestaña de contratos (depende de cuál estuviera activa
+ * la última vez que alguien abrió el documento a mano). Ahora que
+ * añadimos una pestaña nueva "Precios", ese riesgo se vuelve real, así
+ * que aquí se fija por nombre ("Hoja 1") en su lugar.
  */
 
-var SHEET_CONTRATOS = 'Contratos';               // <-- ajusta al nombre real de tu pestaña
-var SHEET_PRECIOS   = 'Precios';                 // pestaña nueva, se crea sola si no existe
+var SHEET_CONTRATOS = 'Hoja 1';                   // pestaña real de contratos
+var SHEET_PRECIOS   = 'Precios';                  // pestaña nueva, se crea sola si no existe
 var SECRET_TOKEN    = 'CAMBIA_ESTE_TOKEN_LARGO';  // debe coincidir con APPS_SCRIPT_TOKEN en Vercel
 
 function doPost(e) {
@@ -55,41 +59,85 @@ function doGet(e) {
   return jsonOut({ ok: false, error: 'action no reconocida' });
 }
 
-/* ================= LEGACY (pega aquí tu doPost actual, TAL CUAL) ================= */
+/* ================= LEGACY (doPost original, con la firma añadida) ================= */
 function legacyLogContract(d) {
-  // >>> SUSTITUYE ESTA FUNCIÓN por el cuerpo exacto de tu doPost de hoy <<<
-  //
-  // Encabezados reales del Sheet (fila 1), en este orden:
-  //   Fecha registro, Nombre, DNI, Teléfono, Email, Dirección, Fecha boda,
-  //   Hora, Lugar evento, Dir. servicio, 2ª dirección, Servicios novia,
-  //   Combinados, Invitadas, Zona, Desplazamiento (€), Beauty Corner,
-  //   Subtotal novia (€), Subtotal invitadas (€), Dto (%), Dto (€),
-  //   Total (€), Depósito (€)
-  //
-  // Tu appendRow actual probablemente sea algo como:
-  //   var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_CONTRATOS);
-  //   sh.appendRow([
-  //     d.timestamp, d.nombre, d.dni, d.tel, d.email, d.dir, d.fechaFmt,
-  //     d.hora, d.lugar, d.dirSrv, d.dirSrv2,
-  //     (d.serviciosNovia || []).join(' | '), (d.combinados || []).join(' | '),
-  //     (d.invitadas || []).join(' | '), d.zona, d.desplazamiento,
-  //     d.beautyCorner ? JSON.stringify(d.beautyCorner) : '',
-  //     d.subtotalNovia, d.subtotalInvitadas, d.descuentoPct,
-  //     d.descuentoImporte, d.total, d.deposito
-  //   ]);
-  //
-  // Añade AL FINAL una columna nueva "Firma" (crea la cabecera en la
-  // celda tras "Depósito (€)" si aún no existe) y añade d.firma al final
-  // del array del appendRow:
-  //     ...
-  //     d.total, d.deposito,
-  //     d.firma || ''   // <-- NUEVO: dataURL de la firma, para poder
-  //                      //     regenerar el contrato desde el admin
-  //   ]);
-  //
-  // return jsonOut({ ok: true });
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_CONTRATOS);
 
-  throw new Error('legacyLogContract: pega aquí tu doPost original antes de desplegar');
+    // Crea la cabecera "Firma" la primera vez (columna 24, justo tras
+    // "Depósito (€)"); en llamadas siguientes ya existe y no hace nada.
+    ensureColumn(sheet, 'Firma');
+
+    sheet.appendRow([
+      d.timestamp || new Date().toISOString(),
+      d.nombre || '',
+      d.dni || '',
+      d.tel || '',
+      d.email || '',
+      d.dir || '',
+      d.fechaFmt || d.fecha || '',
+      d.hora || '',
+      d.lugar || '',
+      d.dirSrv || '',
+      d.dirSrv2 || '',
+      (d.serviciosNovia || []).join(' | '),
+      (d.combinados || []).join(' | '),
+      (d.invitadas || []).join(' | '),
+      d.zona || '',
+      d.desplazamiento || 0,
+      d.beautyCorner ? ('Hotel: ' + (d.beautyCorner.hotel || '-') + ' | Dir: ' + (d.beautyCorner.dir || '-') + (d.beautyCorner.notas ? ' | ' + d.beautyCorner.notas : '')) : '',
+      d.subtotalNovia || 0,
+      d.subtotalInvitadas || 0,
+      d.descuentoPct || 0,
+      d.descuentoImporte || 0,
+      d.total != null ? d.total : 0,
+      d.deposito || 0,
+      d.firma || ''   // NUEVO: dataURL de la firma, para regenerar el contrato desde el admin
+    ]);
+
+    return jsonOut({ ok: true });
+
+  } catch (err) {
+    return jsonOut({ ok: false, error: err.message });
+  }
+}
+
+// Test manual: ejecuta esto desde el editor para verificar permisos.
+// Borra la fila de prueba del Sheet después de comprobar que funciona.
+function testWebhook() {
+  var e = {
+    postData: {
+      contents: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        nombre: 'TEST — Borrar esta fila',
+        dni: '00000000T',
+        tel: '600000000',
+        email: 'test@test.com',
+        dir: 'Dirección de prueba',
+        fecha: '2027-01-01',
+        fechaFmt: '1/1/2027',
+        hora: '12:00',
+        lugar: 'Lugar de prueba',
+        dirSrv: 'Dir servicio prueba',
+        dirSrv2: '',
+        serviciosNovia: ['Maquillaje novia: 270 €'],
+        combinados: [],
+        invitadas: [],
+        zona: 'Granada capital',
+        desplazamiento: 50,
+        beautyCorner: null,
+        subtotalNovia: 270,
+        subtotalInvitadas: 0,
+        descuentoPct: 0,
+        descuentoImporte: 0,
+        total: 320,
+        deposito: '80.00',
+        firma: ''
+      })
+    }
+  };
+  var result = doPost(e);
+  Logger.log(result.getContent());
 }
 
 /* ================= PRECIOS ================= */

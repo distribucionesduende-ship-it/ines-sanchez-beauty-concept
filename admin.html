@@ -240,10 +240,16 @@ function toList(v){
   return [];
 }
 
+// El Sheet guarda Beauty Corner como texto tipo "Hotel: X | Dir: Y | notas"
+// (así lo escribe el doPost real), no como JSON.
 function parseBeautyCorner(v){
   if(!v) return null;
   if(typeof v === 'object') return v;
-  try { return JSON.parse(v); } catch(e){ return { hotel: String(v) }; }
+  var s = String(v).trim();
+  if(!s) return null;
+  var m = s.match(/^Hotel:\s*(.*?)\s*\|\s*Dir:\s*(.*?)(?:\s*\|\s*(.*))?$/);
+  if(m) return { hotel: m[1]==='-'?'':m[1], dir: m[2]==='-'?'':m[2], notas: m[3]||'' };
+  return { hotel: s };
 }
 
 var RENDERED_ROWS = [];
