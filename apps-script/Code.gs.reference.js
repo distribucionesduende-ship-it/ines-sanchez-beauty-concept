@@ -23,13 +23,20 @@
  * getActiveSheet(), que en un Web App no siempre apunta de forma
  * fiable a la pestaña de contratos (depende de cuál estuviera activa
  * la última vez que alguien abrió el documento a mano). Ahora que
- * añadimos una pestaña nueva "Precios", ese riesgo se vuelve real, así
- * que aquí se fija por nombre ("Hoja 1") en su lugar.
+ * añadimos una pestaña nueva "Precios" (y "Pendientes"), ese riesgo se
+ * vuelve real, así que aquí se fija por nombre ("Hoja 1") en su lugar.
+ *
+ * Pestaña "Pendientes" (Fase D): contratos creados por Inés desde el
+ * admin que aún no ha firmado la novia. Cada fila es
+ * [Token, Creado, Datos (JSON)]. Se crea sola la primera vez que se usa
+ * y se borra la fila correspondiente en cuanto la novia firma (o si se
+ * cancela un enlace a mano).
  */
 
-var SHEET_CONTRATOS = 'Hoja 1';                   // pestaña real de contratos
-var SHEET_PRECIOS   = 'Precios';                  // pestaña nueva, se crea sola si no existe
-var SECRET_TOKEN    = 'CAMBIA_ESTE_TOKEN_LARGO';  // debe coincidir con APPS_SCRIPT_TOKEN en Vercel
+var SHEET_CONTRATOS  = 'Hoja 1';                   // pestaña real de contratos
+var SHEET_PRECIOS    = 'Precios';                  // pestaña nueva, se crea sola si no existe
+var SHEET_PENDIENTES = 'Pendientes';               // pestaña nueva, se crea sola si no existe
+var SECRET_TOKEN     = 'CAMBIA_ESTE_TOKEN_LARGO';  // debe coincidir con APPS_SCRIPT_TOKEN en Vercel
 
 function doPost(e) {
   var body;
@@ -43,6 +50,8 @@ function doPost(e) {
     if (body.token !== SECRET_TOKEN) return jsonOut({ ok: false, error: 'token inválido' });
     if (body.action === 'setPrecios') return handleSetPrecios(body);
     if (body.action === 'markPdfSent') return handleMarkPdfSent(body);
+    if (body.action === 'savePending') return handleSavePending(body);
+    if (body.action === 'deletePending') return handleDeletePending(body);
     return jsonOut({ ok: false, error: 'action no reconocida' });
   }
 
@@ -56,6 +65,7 @@ function doGet(e) {
   if (e.parameter.token !== SECRET_TOKEN) return jsonOut({ ok: false, error: 'token inválido' });
   if (action === 'getPrecios') return handleGetPrecios();
   if (action === 'listContracts') return handleListContracts();
+  if (action === 'getPending') return handleGetPending(e);
   return jsonOut({ ok: false, error: 'action no reconocida' });
 }
 
@@ -210,6 +220,64 @@ function handleMarkPdfSent(body) {
   var colFecha = ensureColumn(sh, 'Fecha envío PDF');
   sh.getRange(rowId, colEnviado).setValue('Sí');
   sh.getRange(rowId, colFecha).setValue(new Date().toISOString());
+  return jsonOut({ ok: true });
+}
+
+/* ================= PENDIENTES DE FIRMA (Fase D) ================= */
+
+// Guarda un contrato pendiente de firma. body.pendingToken es el token
+// largo que verá la novia en la URL (generado en Vercel con
+// crypto.randomBytes, NO es el SECRET_TOKEN). body.datos es el
+// formData completo (sin firma ni timestamp todavía).
+function handleSavePending(body) {
+  if (!body.pendingToken || !body.datos) {
+    return jsonOut({ ok: false, error: 'faltan "pendingToken" o "datos"' });
+  }
+  var ss = SpreadsheetApp.getActive();
+  var sh = ss.getSheetByName(SHEET_PENDIENTES);
+  if (!sh) {
+    sh = ss.insertSheet(SHEET_PENDIENTES);
+    sh.appendRow(['Token', 'Creado', 'Datos']);
+  }
+  sh.appendRow([body.pendingToken, new Date().toISOString(), JSON.stringify(body.datos)]);
+  return jsonOut({ ok: true });
+}
+
+// Busca un pendiente por token. Devuelve ok:false si no existe (enlace
+// inválido o ya firmado y borrado, ver handleDeletePending).
+function handleGetPending(e) {
+  var pendingToken = e.parameter.pendingToken;
+  if (!pendingToken) return jsonOut({ ok: false, error: 'pendingToken requerido' });
+  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_PENDIENTES);
+  if (!sh) return jsonOut({ ok: false, error: 'Enlace no válido o ya utilizado' });
+  var data = sh.getDataRange().getValues();
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(pendingToken)) {
+      try {
+        var datos = JSON.parse(data[r][2]);
+        return jsonOut({ ok: true, datos: datos, creado: data[r][1] });
+      } catch (err) {
+        return jsonOut({ ok: false, error: 'Datos corruptos para este enlace' });
+      }
+    }
+  }
+  return jsonOut({ ok: false, error: 'Enlace no válido o ya utilizado' });
+}
+
+// Borra la fila del pendiente tras la firma (o para cancelar un enlace
+// a mano). Idempotente: si ya no existe, sigue devolviendo ok:true
+// (protege contra doble clic / recarga accidental).
+function handleDeletePending(body) {
+  if (!body.pendingToken) return jsonOut({ ok: false, error: 'pendingToken requerido' });
+  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_PENDIENTES);
+  if (!sh) return jsonOut({ ok: true });
+  var data = sh.getDataRange().getValues();
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(body.pendingToken)) {
+      sh.deleteRow(r + 1);
+      return jsonOut({ ok: true });
+    }
+  }
   return jsonOut({ ok: true });
 }
 
