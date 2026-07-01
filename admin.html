@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel de administración — Inés Sánchez Beauty Concept</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="contract-pdf.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600&family=Jost:wght@300;400;500&display=swap');
 :root{--negro:#1a1410;--dorado:#b8972a;--dorado-claro:#d4af37;--crema:#faf7f2;--crema-o:#f0ebe1;--gris:#7a6f65;--borde:#ddd5c8;--ok:#1a7a3a;--err:#c0392b;}
@@ -61,9 +64,38 @@ table.tbl tr:hover td{background:#fbf9f5;}
 .btn-guardar{background:var(--negro);color:#fff;border:none;padding:11px 22px;border-radius:5px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-top:8px;}
 .btn-guardar:hover:not(:disabled){background:var(--dorado);}
 .btn-guardar:disabled{background:var(--borde);cursor:not-allowed;}
+/* CONTRATO (offscreen, para regenerar el PDF — copiado de index.html) */
+#contratoImprimible{position:fixed;left:0;top:0;width:210mm;background:#fff;font-family:Georgia,serif;font-size:10pt;color:#000;margin:0;padding:0;z-index:-1;opacity:0;pointer-events:none;}
+#contratoImprimible .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;background:#fff;box-sizing:border-box;}
+#contratoImprimible .cp-header{text-align:center;border-bottom:2pt solid #1a1410;padding-bottom:10mm;margin-bottom:8mm;}
+#contratoImprimible .cp-logo{max-width:65mm;height:auto;}
+#contratoImprimible .cp-subtitle{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:#7a6f65;margin-top:4mm;}
+#contratoImprimible .cp-titulo{font-size:16pt;font-weight:bold;text-align:center;margin-bottom:6mm;letter-spacing:.05em;}
+#contratoImprimible .cp-parrafo{font-size:9pt;line-height:1.65;margin-bottom:4mm;text-align:justify;}
+#contratoImprimible table{width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:9pt;}
+#contratoImprimible table caption{font-weight:bold;font-size:10pt;background:#1a1410;color:#fff;padding:3mm;text-align:center;letter-spacing:.08em;}
+#contratoImprimible td,#contratoImprimible th{border:0.5pt solid #ddd5c8;padding:2mm 3mm;vertical-align:top;}
+#contratoImprimible th{background:#f0ebe1;font-weight:bold;font-size:7.5pt;text-transform:uppercase;color:#7a6f65;white-space:nowrap;}
+#contratoImprimible tr:nth-child(even) td{background:#faf7f2;}
+#contratoImprimible .cp-total-row td{background:#1a1410!important;color:#fff!important;font-weight:bold;font-size:11pt;}
+#contratoImprimible .cp-dep-row td{background:#f5f0e4!important;font-style:italic;font-size:8.5pt;}
+#contratoImprimible .cp-nota{background:#faf3e0;border:0.5pt solid #b8972a;padding:3mm;font-size:8pt;color:#7a6f65;margin-bottom:5mm;border-radius:1mm;}
+#contratoImprimible .cp-clausula{margin-bottom:3mm;}
+#contratoImprimible .cp-clausula strong{display:inline-block;min-width:28mm;font-size:8.5pt;}
+#contratoImprimible .cp-clausula span{font-size:8.5pt;color:#333;line-height:1.6;}
+#contratoImprimible .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:8mm;}
+#contratoImprimible .firma-box{border:0.5pt solid #ddd5c8;padding:4mm;background:#faf7f2;}
+#contratoImprimible .firma-box .fb-tit{font-size:7.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.1em;color:#7a6f65;margin-bottom:2mm;}
+#contratoImprimible .firma-box .fb-dat{font-size:8.5pt;margin-bottom:1.5mm;}
+#contratoImprimible .firma-box .fb-img{width:100%;height:28mm;border-bottom:0.5pt solid #999;margin:3mm 0 1mm;display:flex;align-items:center;justify-content:center;}
+#contratoImprimible .firma-box .fb-img img{max-height:26mm;max-width:100%;}
+#contratoImprimible .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
+#contratoImprimible .cp-pie{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
 </style>
 </head>
 <body>
+
+<div id="contratoImprimible"></div>
 
 <div id="loginScreen" class="login-wrap">
   <div class="login-box">
@@ -199,7 +231,25 @@ function fmtFecha(v){
   return d.toLocaleDateString('es-ES');
 }
 
+// El Sheet guarda "Servicios novia"/"Combinados"/"Invitadas" como una
+// única celda de texto (el doPost original las une con algún
+// separador). Normaliza a array para poder reusar ContractPDF.
+function toList(v){
+  if(Array.isArray(v)) return v;
+  if(typeof v === 'string' && v.trim()) return v.split(/\s*\|\s*|\s*;\s*|\n/).filter(Boolean);
+  return [];
+}
+
+function parseBeautyCorner(v){
+  if(!v) return null;
+  if(typeof v === 'object') return v;
+  try { return JSON.parse(v); } catch(e){ return { hotel: String(v) }; }
+}
+
+var RENDERED_ROWS = [];
+
 function pintarContratos(rows){
+  RENDERED_ROWS = rows;
   if(!rows.length){
     document.getElementById('tablaWrap').innerHTML = '<div class="estado-vacio">No hay contratos que coincidan con el filtro.</div>';
     return;
@@ -207,10 +257,9 @@ function pintarContratos(rows){
   var html = '<table class="tbl"><thead><tr>'
     + '<th>Novia</th><th>Fecha boda</th><th>Servicios</th><th>Total</th><th>Fecha registro</th><th>PDF enviado</th><th></th>'
     + '</tr></thead><tbody>';
-  rows.forEach(function(row){
-    var servicios = [].concat(row['Servicios novia']||[], row['Combinados']||[]);
-    var serviciosTxt = Array.isArray(servicios) ? servicios.join(', ') : String(servicios||'');
-    if(!serviciosTxt && typeof row['Servicios novia'] === 'string') serviciosTxt = row['Servicios novia'];
+  rows.forEach(function(row, i){
+    var servicios = [].concat(toList(row['Servicios novia']), toList(row['Combinados']));
+    var serviciosTxt = servicios.join(', ');
     var enviado = row['PDF enviado'] === 'Sí';
     html += '<tr>'
       + '<td>'+(row['Nombre']||'—')+'<br><span style="color:var(--gris);font-size:.78rem;">'+(row['Email']||'')+'</span></td>'
@@ -221,12 +270,19 @@ function pintarContratos(rows){
       + '<td>'+(enviado
           ? '<span class="badge si">Sí — '+fmtFecha(row['Fecha envío PDF'])+'</span>'
           : '<span class="badge no">No</span>')+'</td>'
-      + '<td><button class="btn-enviar" disabled title="Disponible próximamente">Enviar contrato</button></td>'
+      + '<td><button class="btn-enviar" data-idx="'+i+'" '+(row['Email']?'':'disabled title="Sin email registrado"')+'>'+(enviado?'Reenviar':'Enviar')+' contrato</button></td>'
       + '</tr>';
   });
   html += '</tbody></table>';
   document.getElementById('tablaWrap').innerHTML = html;
 }
+
+document.getElementById('tablaWrap').addEventListener('click', function(e){
+  var btn = e.target.closest('.btn-enviar');
+  if(!btn || btn.disabled) return;
+  var row = RENDERED_ROWS[Number(btn.getAttribute('data-idx'))];
+  if(row) enviarContratoDesdeFila(row, btn);
+});
 
 function aplicarFiltros(){
   var desde = document.getElementById('fDesde').value;
@@ -354,6 +410,91 @@ document.getElementById('btnGuardarPrecios').addEventListener('click', function(
     msg.textContent = 'Error de conexión: ' + err.message;
   });
 });
+
+// =================== REENVÍO DE CONTRATO EN PDF ===================
+function blobToBase64(blob){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(){
+      var result = reader.result; // data:application/pdf;base64,XXXX
+      resolve(result.slice(result.indexOf(',') + 1));
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function enviarContratoDesdeFila(row, btn){
+  var textoOriginal = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Generando PDF…';
+
+  var d = {
+    nombre: row['Nombre'], dni: row['DNI'], tel: row['Teléfono'], email: row['Email'], dir: row['Dirección'],
+    fechaFmt: fmtFecha(row['Fecha boda']), hora: row['Hora'], lugar: row['Lugar evento'],
+    dirSrv: row['Dir. servicio'], dirSrv2: row['2ª dirección'],
+    serviciosNovia: toList(row['Servicios novia']), combinados: toList(row['Combinados']),
+    invitadas: toList(row['Invitadas']), zona: row['Zona'],
+    desplazamiento: Number(row['Desplazamiento (€)']) || 0,
+    beautyCorner: parseBeautyCorner(row['Beauty Corner']),
+    subtotalNovia: Number(row['Subtotal novia (€)']) || 0,
+    subtotalInvitadas: Number(row['Subtotal invitadas (€)']) || 0,
+    descuentoPct: Number(row['Dto (%)']) || 0,
+    descuentoImporte: Number(row['Dto (€)']) || 0,
+    total: Number(row['Total (€)']) || 0,
+    deposito: row['Depósito (€)'],
+    firma: row['Firma'] || null,
+    hoy: fmtFecha(row['Fecha registro']),
+    logoB64: null
+  };
+
+  var cont = document.getElementById('contratoImprimible');
+  cont.innerHTML = ContractPDF.buildHTML(d);
+
+  var fechaBoda = new Date(row['Fecha boda']);
+  var fechaStr = !isNaN(fechaBoda.getTime()) ? fechaBoda.toISOString().slice(0,10).replace(/-/g,'') : 'contrato';
+  var nombreArchivo = fechaStr + '_' + String(row['Nombre']||'novia').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ]/g,'');
+
+  var msg = document.getElementById('msgTop');
+
+  ContractPDF.renderToPDF(cont, nombreArchivo, { download:false })
+    .then(function(blob){
+      btn.textContent = 'Enviando…';
+      return blobToBase64(blob);
+    })
+    .then(function(base64){
+      return fetch('/api/send-final-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Password': getPassword() },
+        body: JSON.stringify({
+          rowId: row.rowId, timestampValor: row['Fecha registro'],
+          email: row['Email'], nombre: row['Nombre'],
+          filename: nombreArchivo + '.pdf', pdfBase64: base64
+        })
+      });
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      btn.disabled = false;
+      if(j.ok){
+        btn.textContent = 'Reenviar contrato';
+        msg.className = 'msg-top ok';
+        msg.textContent = '✓ Contrato enviado a ' + row['Email'] + '.';
+        cargarContratos();
+      } else {
+        btn.textContent = textoOriginal;
+        msg.className = 'msg-top err';
+        msg.textContent = 'Error enviando el contrato: ' + (j.error || '');
+      }
+      msg.scrollIntoView({behavior:'smooth', block:'center'});
+    })
+    .catch(function(err){
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+      msg.className = 'msg-top err';
+      msg.textContent = 'Error: ' + err.message;
+      msg.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+}
 
 // ---- Arranque ----
 (function(){
