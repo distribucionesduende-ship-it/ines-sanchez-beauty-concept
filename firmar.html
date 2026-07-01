@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firmar contrato — Inés Sánchez Beauty Concept</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="contract-pdf.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600&family=Jost:wght@300;400;500&display=swap');
+:root{--negro:#1a1410;--dorado:#b8972a;--dorado-claro:#d4af37;--crema:#faf7f2;--crema-o:#f0ebe1;--gris:#7a6f65;--borde:#ddd5c8;--ok:#1a7a3a;--err:#c0392b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Jost',sans-serif;background:var(--crema);color:var(--negro);min-height:100vh;}
+.hidden{display:none!important;}
+header.top{background:var(--negro);color:#fff;padding:22px 20px;text-align:center;}
+header.top .tit{font-family:'Cormorant Garamond',serif;font-size:1.3rem;letter-spacing:.1em;}
+header.top .sub{font-size:.68rem;letter-spacing:.2em;color:var(--dorado-claro);margin-top:4px;text-transform:uppercase;}
+main{max-width:820px;margin:0 auto;padding:20px 16px 60px;}
+.card{background:#fff;border-radius:8px;padding:20px 18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.estado-msg{padding:30px 20px;text-align:center;color:var(--gris);}
+.estado-msg.err{color:var(--err);}
+.estado-msg p{font-size:.95rem;line-height:1.6;margin-top:8px;}
+#previewScaleWrap{overflow-x:hidden;overflow-y:auto;max-height:75vh;border:1px solid var(--borde);border-radius:8px;background:var(--crema-o);margin-bottom:8px;}
+#previewScaleInner{transform-origin:top left;width:210mm;}
+/* Estilos del contrato (idénticos a index.html/admin.html) */
+#previewScaleInner .cp-page,#contratoImprimible .cp-page{width:210mm;min-height:297mm;padding:18mm 18mm 22mm;position:relative;background:#fff;box-sizing:border-box;font-family:Georgia,serif;font-size:10pt;color:#000;}
+#previewScaleInner .cp-header,#contratoImprimible .cp-header{text-align:center;border-bottom:2pt solid #1a1410;padding-bottom:10mm;margin-bottom:8mm;}
+#previewScaleInner .cp-logo,#contratoImprimible .cp-logo{max-width:65mm;height:auto;}
+#previewScaleInner .cp-subtitle,#contratoImprimible .cp-subtitle{font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:#7a6f65;margin-top:4mm;}
+#previewScaleInner .cp-titulo,#contratoImprimible .cp-titulo{font-size:16pt;font-weight:bold;text-align:center;margin-bottom:6mm;letter-spacing:.05em;}
+#previewScaleInner .cp-parrafo,#contratoImprimible .cp-parrafo{font-size:9pt;line-height:1.65;margin-bottom:4mm;text-align:justify;}
+#previewScaleInner table,#contratoImprimible table{width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:9pt;}
+#previewScaleInner table caption,#contratoImprimible table caption{font-weight:bold;font-size:10pt;background:#1a1410;color:#fff;padding:3mm;text-align:center;letter-spacing:.08em;}
+#previewScaleInner td,#previewScaleInner th,#contratoImprimible td,#contratoImprimible th{border:0.5pt solid #ddd5c8;padding:2mm 3mm;vertical-align:top;}
+#previewScaleInner th,#contratoImprimible th{background:#f0ebe1;font-weight:bold;font-size:7.5pt;text-transform:uppercase;color:#7a6f65;white-space:nowrap;}
+#previewScaleInner tr:nth-child(even) td,#contratoImprimible tr:nth-child(even) td{background:#faf7f2;}
+#previewScaleInner .cp-total-row td,#contratoImprimible .cp-total-row td{background:#1a1410!important;color:#fff!important;font-weight:bold;font-size:11pt;}
+#previewScaleInner .cp-dep-row td,#contratoImprimible .cp-dep-row td{background:#f5f0e4!important;font-style:italic;font-size:8.5pt;}
+#previewScaleInner .cp-nota,#contratoImprimible .cp-nota{background:#faf3e0;border:0.5pt solid #b8972a;padding:3mm;font-size:8pt;color:#7a6f65;margin-bottom:5mm;border-radius:1mm;}
+#previewScaleInner .cp-clausula,#contratoImprimible .cp-clausula{margin-bottom:3mm;}
+#previewScaleInner .cp-clausula strong,#contratoImprimible .cp-clausula strong{display:inline-block;min-width:28mm;font-size:8.5pt;}
+#previewScaleInner .cp-clausula span,#contratoImprimible .cp-clausula span{font-size:8.5pt;color:#333;line-height:1.6;}
+#previewScaleInner .firmas-grid,#contratoImprimible .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:8mm;}
+#previewScaleInner .firma-box,#contratoImprimible .firma-box{border:0.5pt solid #ddd5c8;padding:4mm;background:#faf7f2;}
+#previewScaleInner .firma-box .fb-tit,#contratoImprimible .firma-box .fb-tit{font-size:7.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.1em;color:#7a6f65;margin-bottom:2mm;}
+#previewScaleInner .firma-box .fb-dat,#contratoImprimible .firma-box .fb-dat{font-size:8.5pt;margin-bottom:1.5mm;}
+#previewScaleInner .firma-box .fb-img,#contratoImprimible .firma-box .fb-img{width:100%;height:28mm;border-bottom:0.5pt solid #999;margin:3mm 0 1mm;display:flex;align-items:center;justify-content:center;}
+#previewScaleInner .firma-box .fb-img img,#contratoImprimible .firma-box .fb-img img{max-height:26mm;max-width:100%;}
+#previewScaleInner .firma-box .fb-fecha,#contratoImprimible .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
+#previewScaleInner .cp-pie,#contratoImprimible .cp-pie{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
+#contratoImprimible{position:fixed;left:0;top:0;width:210mm;z-index:-1;opacity:0;pointer-events:none;margin:0;padding:0;background:#fff;}
+</style>
+</head>
+<body>
+
+<div id="contratoImprimible"></div>
+
+<header class="top">
+  <div class="tit">INÉS SÁNCHEZ</div>
+  <div class="sub">Firma de contrato</div>
+</header>
+
+<main>
+  <div id="estadoCargando" class="card estado-msg">Cargando tu contrato…</div>
+
+  <div id="estadoError" class="card estado-msg err hidden">
+    <strong>Enlace no válido</strong>
+    <p id="estadoErrorTexto">Este enlace no es válido o el contrato ya fue firmado. Contacta con Inés Sánchez para solicitar uno nuevo.</p>
+  </div>
+
+  <div id="contenidoFirma" class="hidden">
+    <div class="card">
+      <div id="previewScaleWrap"><div id="previewScaleInner"></div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+var TOKEN = new URLSearchParams(location.search).get('token');
+var DATOS_PENDIENTE = null;
+
+function mostrarError(texto){
+  document.getElementById('estadoCargando').classList.add('hidden');
+  document.getElementById('estadoError').classList.remove('hidden');
+  if(texto) document.getElementById('estadoErrorTexto').textContent = texto;
+}
+
+function escalarPreview(){
+  var inner = document.getElementById('previewScaleInner');
+  var wrap = document.getElementById('previewScaleWrap');
+  var escala = Math.min(1, (wrap.clientWidth - 4) / 793.7); // 210mm a 96dpi
+  inner.style.transform = 'scale(' + escala + ')';
+  wrap.style.height = (inner.scrollHeight * escala + 8) + 'px';
+}
+window.addEventListener('resize', function(){
+  if(DATOS_PENDIENTE) escalarPreview();
+});
+
+if(!TOKEN){
+  mostrarError('Falta el código de acceso en el enlace. Revisa que hayas copiado la URL completa.');
+} else {
+  fetch('/api/pending?token=' + encodeURIComponent(TOKEN))
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(!j.ok || !j.datos){
+        mostrarError();
+        return;
+      }
+      DATOS_PENDIENTE = j.datos;
+      var hoy = new Date().toLocaleDateString('es-ES');
+      var html = ContractPDF.buildHTML(Object.assign({}, DATOS_PENDIENTE, { firma: null, logoB64: null, hoy: hoy }));
+      document.getElementById('previewScaleInner').innerHTML = html;
+
+      document.getElementById('estadoCargando').classList.add('hidden');
+      document.getElementById('contenidoFirma').classList.remove('hidden');
+      escalarPreview();
+    })
+    .catch(function(err){
+      mostrarError('Error de conexión: ' + err.message + '. Comprueba tu conexión e inténtalo de nuevo.');
+    });
+}
+</script>
+</body>
+</html>
