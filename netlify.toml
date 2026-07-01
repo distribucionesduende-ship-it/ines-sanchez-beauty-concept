@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api/*"
+  to = "https://ines-sanchez-beauty-concept.vercel.app/api/:splat"
+  status = 200
+  force = true
