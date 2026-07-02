@@ -229,23 +229,30 @@ document.getElementById('btnFirmar').addEventListener('click', function(){
   var fechaStr = (finalFormData.fecha || '').replace(/-/g, '') || 'contrato';
   var nombreArchivo = fechaStr + '_' + String(finalFormData.nombre || 'novia').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_áéíóúÁÉÍÓÚñÑ]/g, '');
 
-  ContractPDF.renderToPDF(cont, nombreArchivo)
+  var pdfBlob = null;
+  ContractPDF.renderToPDF(cont)
     .then(function(blob){
+      pdfBlob = blob;
       btn.textContent = 'Enviando…';
-      return blobToBase64(blob).then(function(base64){
-        return fetch('/api/send-email', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalFormData)
-        })
-        .then(function(r){ return r.json(); })
-        .then(function(result){
-          if(!result.ok) throw new Error(result.error || 'No se pudo registrar el contrato');
-          return base64;
-        });
+      return blobToBase64(blob);
+    })
+    .then(function(base64){
+      // Registrar el contrato ANTES de descargar el PDF: en iOS Safari,
+      // iniciar una descarga puede cancelar peticiones fetch en marcha,
+      // así que el envío/registro va primero y la descarga local queda
+      // como último paso, cuando ya no hay nada crítico pendiente.
+      return fetch('/api/send-email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalFormData)
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(result){
+        if(!result.ok) throw new Error(result.error || 'No se pudo registrar el contrato');
+        return base64;
       });
     })
     .then(function(base64){
-      // Best-effort: si esto falla, el contrato ya quedó registrado y
-      // descargado — no se bloquea la confirmación a la novia por ello.
+      // Best-effort: si esto falla, el contrato ya quedó registrado —
+      // no se bloquea la confirmación a la novia por ello.
       return fetch('/api/complete-signing', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -255,6 +262,7 @@ document.getElementById('btnFirmar').addEventListener('click', function(){
       }).catch(function(err){ console.warn('[complete-signing] fallo no bloqueante:', err); });
     })
     .then(function(){
+      ContractPDF.downloadBlob(pdfBlob, nombreArchivo + '.pdf');
       document.getElementById('contenidoFirma').classList.add('hidden');
       document.getElementById('confirmacionFinal').classList.remove('hidden');
       document.getElementById('confirmacionFinal').scrollIntoView({behavior:'smooth', block:'center'});
@@ -262,7 +270,7 @@ document.getElementById('btnFirmar').addEventListener('click', function(){
     .catch(function(err){
       btn.disabled = false; btn.textContent = 'Firmar contrato';
       msg.className = 'msg err';
-      msg.textContent = 'Hubo un problema: ' + (err.message || err) + '. Si se descargó un PDF, guárdalo; en cualquier caso, vuelve a intentarlo o contacta con Inés.';
+      msg.textContent = 'Hubo un problema: ' + (err.message || err) + '. Tu contrato NO se ha descargado ni registrado — vuelve a intentarlo o contacta con Inés.';
       msg.scrollIntoView({behavior:'smooth', block:'center'});
     });
 });

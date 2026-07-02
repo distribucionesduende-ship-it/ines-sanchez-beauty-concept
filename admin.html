@@ -783,7 +783,7 @@ function enviarContratoDesdeFila(row, btn){
 
   var msg = document.getElementById('msgTop');
 
-  ContractPDF.renderToPDF(cont, nombreArchivo, { download:false })
+  ContractPDF.renderToPDF(cont)
     .then(function(blob){
       btn.textContent = 'Enviando…';
       return blobToBase64(blob);

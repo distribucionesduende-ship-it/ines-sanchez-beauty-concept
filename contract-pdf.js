@@ -103,13 +103,13 @@ window.ContractPDF = (function(){
 
   // Renderiza el HTML ya inyectado en `containerEl` (debe contener los
   // `.cp-page` a capturar) a un PDF, vía html2canvas + jsPDF. Devuelve
-  // una Promise<Blob>. Si opts.download !== false, además dispara la
-  // descarga en el navegador (comportamiento histórico para el
-  // formulario público); admin.html puede pasar {download:false} para
-  // solo obtener el blob sin descargarlo también localmente.
-  function renderToPDF(containerEl, nombreArchivo, opts){
-    opts = opts || {};
-    var download = opts.download !== false;
+  // una Promise<Blob> — nunca descarga nada por sí sola. La descarga
+  // local es responsabilidad explícita del llamante (ver downloadBlob),
+  // y debe dispararse DESPUÉS de que las llamadas críticas al servidor
+  // hayan terminado: en iOS Safari, iniciar una descarga puede cancelar
+  // peticiones fetch en marcha, así que mezclar ambas cosas dentro de
+  // esta función causó que contratos quedaran sin registrar/notificar.
+  function renderToPDF(containerEl){
     return new Promise(function(resolve, reject){
       var contenedor = containerEl;
 
@@ -160,7 +160,6 @@ window.ContractPDF = (function(){
         var procesarPagina = function(index){
           if(index >= paginas.length){
             try {
-              if(download) pdf.save(nombreArchivo + '.pdf');
               var blob = pdf.output('blob');
               return resolve(blob);
             } catch(e) { return reject(e); }
@@ -189,5 +188,19 @@ window.ContractPDF = (function(){
     });
   }
 
-  return { buildHTML: buildHTML, renderToPDF: renderToPDF };
+  // Dispara la descarga de un Blob ya generado. Separado de renderToPDF
+  // a propósito: el llamante decide CUÁNDO descargar (normalmente
+  // después de confirmar el registro/envío del contrato, nunca antes).
+  function downloadBlob(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  return { buildHTML: buildHTML, renderToPDF: renderToPDF, downloadBlob: downloadBlob };
 })();

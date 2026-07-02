@@ -673,37 +673,45 @@ function generarContrato(){
   btn.textContent='Generando PDF…';
 
   // Generar PDF con html2canvas + jsPDF (funciona en TODOS los navegadores móviles)
-  ContractPDF.renderToPDF(document.getElementById('contratoImprimible'), nombreArchivo)
+  ContractPDF.renderToPDF(document.getElementById('contratoImprimible'))
     .then(function(blob){
       window.lastContractPDF = {
         blob: blob, filename: nombreArchivo + '.pdf',
         nombre: nombre, email: email
       };
-      btn.disabled=false;
-      btn.textContent='Generar contrato en PDF';
-      eO.textContent='✓ Tu contrato se ha descargado correctamente. Si no lo encuentras, revisa la carpeta de Descargas de tu dispositivo.';
-      eO.className='msg ok';
-      eO.scrollIntoView({behavior:'smooth',block:'center'});
+      btn.textContent='Enviando…';
 
-      // Enviar emails (notificación a DyD + confirmación a novia)
-      // No bloquea la descarga del PDF — si falla, el contrato ya se descargó
-      fetch('/api/send-email', {
+      // Registrar el contrato ANTES de descargar el PDF: en iOS Safari,
+      // iniciar una descarga puede cancelar peticiones fetch en marcha,
+      // así que el envío va primero y la descarga local queda al final.
+      return fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
       .then(function(r){ return r.json(); })
       .then(function(result){
+        btn.disabled=false;
+        btn.textContent='Generar contrato en PDF';
+        ContractPDF.downloadBlob(blob, nombreArchivo + '.pdf');
         if(result.ok){
           console.log('[Email] Notificaciones enviadas correctamente');
           eO.textContent='✓ Contrato descargado y notificaciones enviadas correctamente.';
         } else {
           console.warn('[Email] Respuesta inesperada:', result);
+          eO.textContent='✓ Tu contrato se ha descargado correctamente. Si no lo encuentras, revisa la carpeta de Descargas de tu dispositivo.';
         }
+        eO.className='msg ok';
+        eO.scrollIntoView({behavior:'smooth',block:'center'});
       })
       .catch(function(err){
         console.warn('[Email] No se pudieron enviar las notificaciones:', err);
-        // No mostrar error a la novia — el PDF ya se descargó bien
+        btn.disabled=false;
+        btn.textContent='Generar contrato en PDF';
+        ContractPDF.downloadBlob(blob, nombreArchivo + '.pdf');
+        eO.textContent='✓ Tu contrato se ha descargado correctamente. Si no lo encuentras, revisa la carpeta de Descargas de tu dispositivo.';
+        eO.className='msg ok';
+        eO.scrollIntoView({behavior:'smooth',block:'center'});
       });
     })
     .catch(function(error){
