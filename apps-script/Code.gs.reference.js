@@ -77,7 +77,6 @@ function legacyLogContract(d) {
     // Crea la cabecera "Firma" la primera vez (columna 24, justo tras
     // "Depósito (€)"); en llamadas siguientes ya existe y no hace nada.
     ensureColumn(sheet, 'Firma');
-    ensureColumn(sheet, 'Autoriza imagen');
 
     sheet.appendRow([
       d.timestamp || new Date().toISOString(),
@@ -103,9 +102,15 @@ function legacyLogContract(d) {
       d.descuentoImporte || 0,
       d.total != null ? d.total : 0,
       d.deposito || 0,
-      d.firma || '',   // dataURL de la firma, para regenerar el contrato desde el admin
-      d.aceptaImagen ? 'Sí' : 'No'   // NUEVO: consentimiento de uso publicitario de imagen
+      d.firma || ''   // dataURL de la firma, para regenerar el contrato desde el admin
     ]);
+
+    // Consentimiento de uso publicitario de imagen — se escribe por nombre
+    // de columna, no por posición, para no pisar "PDF enviado" / "Fecha
+    // envío PDF" que ya ocupan las columnas siguientes a "Firma".
+    var colImagen = ensureColumn(sheet, 'Autoriza imagen');
+    var rowId = sheet.getLastRow();
+    sheet.getRange(rowId, colImagen).setValue(d.aceptaImagen ? 'Sí' : 'No');
 
     return jsonOut({ ok: true });
 
