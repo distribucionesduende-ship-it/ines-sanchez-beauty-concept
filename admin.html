@@ -512,14 +512,133 @@ function abrirListaDia(reservas){
   document.getElementById('calModalBox').querySelector('[data-cerrar]').addEventListener('click', cerrarModal);
 }
 
-// Detalle mínimo de solo lectura (placeholder). Se completa con el
-// resto de columnas y las acciones cancelar/editar en el bloque
-// siguiente.
+function campoDet(lbl, val){
+  return '<div class="campo-det"><div class="lbl">'+lbl+'</div><div>'+(val==null||val===''?'—':val)+'</div></div>';
+}
+
 function abrirDetalle(row){
-  document.getElementById('calModalBox').innerHTML =
-    '<button class="modal-close" data-cerrar>✕</button><h3>'+(row['Nombre']||'—')+'</h3>'
-    + '<p>Fecha boda: '+(row['Fecha boda']||'—')+' · Hora: '+parseHoraStr(row['Hora'])+'</p>';
+  var firmaOk = !!(row['Firma'] && String(row['Firma']).trim());
+  var cancelada = row['Estado'] === 'Cancelada';
+  var html = '<button class="modal-close" data-cerrar>✕</button><h3>'+(row['Nombre']||'—')+'</h3>';
+  html += '<div class="cal-detalle-grid">'
+    + campoDet('DNI', row['DNI']) + campoDet('Teléfono', row['Teléfono'])
+    + campoDet('Email', row['Email']) + campoDet('Dirección', row['Dirección'])
+    + campoDet('Fecha boda', row['Fecha boda']) + campoDet('Hora', parseHoraStr(row['Hora']))
+    + campoDet('Lugar evento', row['Lugar evento']) + campoDet('Dir. servicio', row['Dir. servicio'])
+    + campoDet('2ª dirección', row['2ª dirección']) + campoDet('Zona', row['Zona'])
+    + campoDet('Servicios novia', toList(row['Servicios novia']).join(', '))
+    + campoDet('Combinados', toList(row['Combinados']).join(', '))
+    + campoDet('Invitadas', toList(row['Invitadas']).join(' | '))
+    + campoDet('Desplazamiento', row['Desplazamiento (€)']!=null ? row['Desplazamiento (€)']+' €' : '—')
+    + campoDet('Beauty Corner', row['Beauty Corner'])
+    + campoDet('Subtotal novia', row['Subtotal novia (€)']!=null ? row['Subtotal novia (€)']+' €' : '—')
+    + campoDet('Subtotal invitadas', row['Subtotal invitadas (€)']!=null ? row['Subtotal invitadas (€)']+' €' : '—')
+    + campoDet('Dto', (row['Dto (%)']||0)+'% / '+(row['Dto (€)']||0)+' €')
+    + campoDet('Total', row['Total (€)']!=null ? row['Total (€)']+' €' : '—')
+    + campoDet('Depósito', row['Depósito (€)'])
+    + campoDet('Firma', firmaOk ? 'Sí' : 'No')
+    + campoDet('PDF enviado', row['PDF enviado']==='Sí' ? 'Sí — '+fmtFecha(row['Fecha envío PDF']) : 'No')
+    + campoDet('Autoriza imagen', row['Autoriza imagen'])
+    + campoDet('Estado', cancelada ? 'Cancelada' : 'Activa')
+    + '</div>';
+
+  html += '<div id="calEditWrap"></div>';
+  html += '<div class="cal-acciones">'
+    + (cancelada ? '' : '<button class="btn-cancelar" id="btnCalCancelar">Cancelar reserva</button>')
+    + (cancelada ? '' : '<button class="btn-add" id="btnCalEditar">Editar fecha/hora/lugar</button>')
+    + '</div>';
+  html += '<div class="msg-top" id="calDetMsg"></div>';
+
+  document.getElementById('calModalBox').innerHTML = html;
   document.getElementById('calModalBox').querySelector('[data-cerrar]').addEventListener('click', cerrarModal);
+
+  if(!cancelada){
+    document.getElementById('btnCalCancelar').addEventListener('click', function(){ confirmarCancelar(row); });
+    document.getElementById('btnCalEditar').addEventListener('click', function(){ mostrarFormEditar(row); });
+  }
+}
+
+function confirmarCancelar(row){
+  if(!confirm('¿Seguro que quieres cancelar la reserva de '+row['Nombre']+'? Se avisará por email y no se puede deshacer desde aquí.')) return;
+  var btn = document.getElementById('btnCalCancelar');
+  btn.disabled = true; btn.textContent = 'Cancelando…';
+  fetch('/api/cancel-reservation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': getPassword() },
+    body: JSON.stringify({ rowId: row.rowId, timestampValor: row['Fecha registro'] })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    var msg = document.getElementById('calDetMsg');
+    if(j.ok){
+      msg.className = 'msg-top ok'; msg.textContent = '✓ Reserva cancelada.';
+      cerrarModal();
+      cargarContratos();
+    } else {
+      btn.disabled = false; btn.textContent = 'Cancelar reserva';
+      msg.className = 'msg-top err';
+      msg.textContent = j.error === 'row_mismatch'
+        ? 'Los datos han cambiado desde que abriste esta reserva. Cierra y vuelve a intentarlo.'
+        : 'Error: ' + (j.error||'');
+    }
+  })
+  .catch(function(err){
+    btn.disabled = false; btn.textContent = 'Cancelar reserva';
+    var msg = document.getElementById('calDetMsg');
+    msg.className = 'msg-top err'; msg.textContent = 'Error de conexión: ' + err.message;
+  });
+}
+
+function mostrarFormEditar(row){
+  var parts = parseFechaBodaParts(row['Fecha boda']);
+  var fechaVal = parts ? parts.y+'-'+String(parts.m).padStart(2,'0')+'-'+String(parts.d).padStart(2,'0') : '';
+  var horaVal = parseHoraStr(row['Hora']);
+  document.getElementById('calEditWrap').innerHTML =
+    '<div class="nc-grid" style="margin-top:12px;">'
+    + '<div class="campo"><label>Fecha boda</label><input type="date" id="editFecha" value="'+fechaVal+'"></div>'
+    + '<div class="campo"><label>Hora</label><input type="time" id="editHora" value="'+horaVal+'"></div>'
+    + '<div class="campo"><label>Lugar evento</label><input type="text" id="editLugar" value="'+String(row['Lugar evento']||'').replace(/"/g,'&quot;')+'"></div>'
+    + '</div><button class="btn-guardar" id="btnGuardarEdicion" type="button">Guardar cambios</button>';
+  document.getElementById('btnGuardarEdicion').addEventListener('click', function(){ guardarEdicion(row); });
+}
+
+function guardarEdicion(row){
+  var fecha = document.getElementById('editFecha').value;
+  var hora = document.getElementById('editHora').value;
+  var lugar = document.getElementById('editLugar').value.trim();
+  if(!fecha || !hora || !lugar){ alert('Rellena fecha, hora y lugar.'); return; }
+  var fechaFmt = new Date(fecha+'T12:00:00').toLocaleDateString('es-ES');
+
+  var btn = document.getElementById('btnGuardarEdicion');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  fetch('/api/update-reservation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': getPassword() },
+    body: JSON.stringify({
+      rowId: row.rowId, timestampValor: row['Fecha registro'],
+      fechaBoda: fecha, fechaBodaFmt: fechaFmt, hora: hora, lugarEvento: lugar
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    var msg = document.getElementById('calDetMsg');
+    if(j.ok){
+      msg.className = 'msg-top ok'; msg.textContent = '✓ Reserva actualizada.';
+      cerrarModal();
+      cargarContratos();
+    } else {
+      btn.disabled = false; btn.textContent = 'Guardar cambios';
+      msg.className = 'msg-top err';
+      msg.textContent = j.error === 'row_mismatch'
+        ? 'Los datos han cambiado desde que abriste esta reserva. Cierra y vuelve a intentarlo.'
+        : 'Error: ' + (j.error||'');
+    }
+  })
+  .catch(function(err){
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+    var msg = document.getElementById('calDetMsg');
+    msg.className = 'msg-top err'; msg.textContent = 'Error de conexión: ' + err.message;
+  });
 }
 
 var RENDERED_ROWS = [];
