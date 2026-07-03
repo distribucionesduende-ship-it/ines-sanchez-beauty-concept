@@ -49,6 +49,14 @@ main{max-width:820px;margin:0 auto;padding:20px 16px 60px;}
 #previewScaleInner .firma-box .fb-img img,#contratoImprimible .firma-box .fb-img img{max-height:26mm;max-width:100%;}
 #previewScaleInner .firma-box .fb-fecha,#contratoImprimible .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
 #previewScaleInner .cp-pie,#contratoImprimible .cp-pie{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
+/* Solo en la vista previa en pantalla (no en el PDF real): no forzamos
+   que cada página ocupe un A4 completo. Si una página tiene menos
+   texto del que cabría en 297mm, sin esto queda un hueco en blanco
+   forzado hasta completar esa altura — confuso al hacer scroll, antes
+   de llegar a la firma manual real. El PDF (#contratoImprimible) sí
+   mantiene el alto A4 completo, ahí es correcto. */
+#previewScaleInner .cp-page{min-height:0;}
+#previewScaleInner .cp-pie{position:static;margin-top:8mm;}
 #contratoImprimible{position:fixed;left:0;top:0;width:210mm;z-index:-1;opacity:0;pointer-events:none;margin:0;padding:0;background:#fff;}
 /* FIRMA */
 .firma-hdr{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--gris);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
