@@ -78,8 +78,9 @@ canvas{display:block;width:100%;height:150px;cursor:crosshair;touch-action:none;
   <div id="estadoCargando" class="card estado-msg">Cargando tu contrato…</div>
 
   <div id="estadoError" class="card estado-msg err hidden">
-    <strong>Enlace no válido</strong>
+    <strong id="estadoErrorTitulo">Enlace no válido</strong>
     <p id="estadoErrorTexto">Este enlace no es válido o el contrato ya fue firmado. Contacta con Inés Sánchez para solicitar uno nuevo.</p>
+    <button class="btn-clear hidden" id="btnReintentarCarga" type="button" style="margin-top:10px;">Reintentar</button>
   </div>
 
   <div id="contenidoFirma" class="hidden">
@@ -106,11 +107,18 @@ canvas{display:block;width:100%;height:150px;cursor:crosshair;touch-action:none;
 var TOKEN = new URLSearchParams(location.search).get('token');
 var DATOS_PENDIENTE = null;
 
-function mostrarError(texto){
+function mostrarError(texto, reintentable){
   document.getElementById('estadoCargando').classList.add('hidden');
   document.getElementById('estadoError').classList.remove('hidden');
-  if(texto) document.getElementById('estadoErrorTexto').textContent = texto;
+  document.getElementById('estadoErrorTitulo').textContent = reintentable ? 'No se pudo cargar tu contrato' : 'Enlace no válido';
+  document.getElementById('estadoErrorTexto').textContent = texto || 'Este enlace no es válido o el contrato ya fue firmado. Contacta con Inés Sánchez para solicitar uno nuevo.';
+  document.getElementById('btnReintentarCarga').classList.toggle('hidden', !reintentable);
 }
+document.getElementById('btnReintentarCarga').addEventListener('click', function(){
+  document.getElementById('estadoError').classList.add('hidden');
+  document.getElementById('estadoCargando').classList.remove('hidden');
+  cargarPendiente(2);
+});
 
 function escalarPreview(){
   var inner = document.getElementById('previewScaleInner');
@@ -123,16 +131,32 @@ window.addEventListener('resize', function(){
   if(DATOS_PENDIENTE) escalarPreview();
 });
 
-if(!TOKEN){
-  mostrarError('Falta el código de acceso en el enlace. Revisa que hayas copiado la URL completa.');
-} else {
+// Apps Script puede tardar en "despertar" (cold start) y nuestro propio
+// /api/pending responde 502 {transient:true} si eso supera su margen de
+// espera. Un 502 transitorio NO significa que el enlace sea inválido —
+// se reintenta automáticamente antes de mostrar cualquier mensaje de
+// error a la novia, para no confundir un problema momentáneo de carga
+// con un enlace roto.
+function cargarPendiente(reintentosRestantes){
   fetch('/api/pending?token=' + encodeURIComponent(TOKEN))
-    .then(function(r){ return r.json(); })
-    .then(function(j){
-      if(!j.ok || !j.datos){
-        mostrarError();
+    .then(function(r){ return r.json().then(function(j){ return { status: r.status, body: j }; }); })
+    .then(function(res){
+      var j = res.body;
+      var esTransitorio = res.status === 502 || (j && j.transient);
+
+      if(esTransitorio && reintentosRestantes > 0){
+        setTimeout(function(){ cargarPendiente(reintentosRestantes - 1); }, 1500);
         return;
       }
+      if(!j.ok || !j.datos){
+        if(esTransitorio){
+          mostrarError('No hemos podido cargar tu contrato por un problema temporal de conexión. Pulsa "Reintentar" en unos segundos.', true);
+        } else {
+          mostrarError();
+        }
+        return;
+      }
+
       DATOS_PENDIENTE = j.datos;
       var hoy = new Date().toLocaleDateString('es-ES');
       var html = ContractPDF.buildHTML(Object.assign({}, DATOS_PENDIENTE, { firma: null, logoB64: null, hoy: hoy }));
@@ -144,8 +168,18 @@ if(!TOKEN){
       initFirmaCanvas();
     })
     .catch(function(err){
-      mostrarError('Error de conexión: ' + err.message + '. Comprueba tu conexión e inténtalo de nuevo.');
+      if(reintentosRestantes > 0){
+        setTimeout(function(){ cargarPendiente(reintentosRestantes - 1); }, 1500);
+        return;
+      }
+      mostrarError('Error de conexión: ' + err.message + '. Comprueba tu conexión y pulsa "Reintentar".', true);
     });
+}
+
+if(!TOKEN){
+  mostrarError('Falta el código de acceso en el enlace. Revisa que hayas copiado la URL completa.');
+} else {
+  cargarPendiente(2);
 }
 
 // =================== FIRMA CANVAS ===================

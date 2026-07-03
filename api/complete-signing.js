@@ -72,12 +72,15 @@ module.exports = async (req, res) => {
   var token = process.env.APPS_SCRIPT_TOKEN;
   if (sheetUrl && token) {
     try {
+      var controller = new AbortController();
+      var timeout = setTimeout(function () { controller.abort(); }, 9000); // margen para cold start de Apps Script
       var rSheet = await fetch(sheetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'deletePending', token: token, pendingToken: d.pendingToken }),
-        redirect: 'follow'
+        redirect: 'follow', signal: controller.signal
       });
+      clearTimeout(timeout);
       var jSheet = await rSheet.json();
       deleted = !!(jSheet && jSheet.ok);
     } catch (err) {

@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
       'action=listContracts&token=' + encodeURIComponent(token);
 
     var controller = new AbortController();
-    var timeout = setTimeout(function () { controller.abort(); }, 8000);
+    var timeout = setTimeout(function () { controller.abort(); }, 9000); // margen para cold start de Apps Script
     var r = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
     clearTimeout(timeout);
 

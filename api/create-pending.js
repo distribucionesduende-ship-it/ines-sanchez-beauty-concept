@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
 
   try {
     var controller = new AbortController();
-    var timeout = setTimeout(function () { controller.abort(); }, 8000);
+    var timeout = setTimeout(function () { controller.abort(); }, 9000); // margen para cold start de Apps Script
     var r = await fetch(sheetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
