@@ -75,7 +75,7 @@ window.ContractPDF = (function(){
       +'<tr class="cp-dep-row"><td colspan="2">Depósito inicial (25%) a abonar al formalizar</td><td style="text-align:right;">'+d.deposito+' €</td></tr>'
       +'</table>'
       +'</div>'
-      // PÁGINA 2
+      // PÁGINA 2 — cláusulas 1-5 (mitad del volumen de texto legal)
       +'<div class="cp-page">'
       +'<div class="cp-header" style="padding-bottom:5mm;margin-bottom:5mm;"><strong style="font-size:11pt;letter-spacing:.05em;">TÉRMINOS Y CONDICIONES</strong></div>'
       +'<div class="cp-clausula"><strong>1. Objeto</strong><span>Prestación de servicios de peluquería y/o estética, incluyendo maquillaje, manicuras, pedicuras o tratamientos faciales o corporales, con motivo del enlace matrimonial.</span></div>'
@@ -83,6 +83,10 @@ window.ContractPDF = (function(){
       +'<div class="cp-clausula"><strong>3. Precio y Pago</strong><span>Precios con IVA incluido. Pago en tres plazos, referidos siempre a la fecha de la boda: 25% en concepto de depósito de reserva al firmar el contrato (no reembolsable, salvo desistimiento según cláusula 4) · 25% adicional entre 8 y 6 semanas antes de la boda · 50% restante, como máximo 7 días antes de la boda. Formas de pago: transferencia, tarjeta o efectivo. El impago de cualquier plazo en la fecha indicada faculta a LA EMPRESA a suspender la prestación del servicio hasta su regularización. El precio pactado en la firma se mantiene fijo, sin perjuicio de los ajustes derivados de las cláusulas 5 y 11.</span></div>'
       +'<div class="cp-clausula"><strong>4. Cancelación</strong><span>Desistimiento: 7 días naturales desde la firma, con devolución íntegra del depósito, siempre que ese plazo termine con 30 o más días de antelación a la boda. Cancelación con 30+ días de antelación a la boda (fuera del plazo de desistimiento): se retiene el depósito (25%); se devuelve cualquier cantidad adicional ya abonada. Cancelación con menos de 30 días de antelación: no procede devolución de ninguna cantidad abonada. Cancelación por LA EMPRESA sin causa: devolución íntegra.</span></div>'
       +'<div class="cp-clausula"><strong>5. Cambios</strong><span>Modificaciones sobre los servicios de LA NOVIA ya contratados (horario, ubicación, tipo de servicio) solicitadas por LA CLIENTA: sin coste si se comunican con 10 o más días de antelación a la boda. Con menos de 10 días: recargo del 20% sobre el importe de los servicios de la novia recogido en la Tabla I del contrato en el momento de su firma inicial, en concepto de reorganización de agenda y logística. Las ampliaciones de servicios para invitadas se rigen por la cláusula 11.</span></div>'
+      +'</div>'
+      // PÁGINA 3 — cláusulas 6-12 + firmas
+      +'<div class="cp-page">'
+      +'<div class="cp-header" style="padding-bottom:5mm;margin-bottom:5mm;"><strong style="font-size:11pt;letter-spacing:.05em;">TÉRMINOS Y CONDICIONES (continuación)</strong></div>'
       +'<div class="cp-clausula"><strong>6. Obligaciones</strong><span>Espacio con electricidad, agua e higiene adecuadas. LA CLIENTA deberá informar con antelación de aquellas condiciones médicas o alergias que puedan afectar a la prestación de los servicios contratados (p. ej. alergias a productos cosméticos, afecciones cutáneas o capilares, tratamientos dermatológicos recientes). LA EMPRESA no responde de reacciones o incidencias derivadas de condiciones no comunicadas.</span></div>'
       +'<div class="cp-clausula"><strong>7. Responsabilidad</strong><span>Seguro de RC profesional. Sin responsabilidad por causas ajenas: tráfico, fuerza mayor, condiciones del local no imputables a LA EMPRESA.</span></div>'
       +'<div class="cp-clausula"><strong>8. Fuerza Mayor</strong><span>Personal sustituto de equivalente cualificación o reembolso íntegro de cantidades abonadas por servicios no prestados.</span></div>'
