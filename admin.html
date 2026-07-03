@@ -111,6 +111,34 @@ table.tbl tr:hover td{background:#fbf9f5;}
 #contratoImprimible .firma-box .fb-img img{max-height:26mm;max-width:100%;}
 #contratoImprimible .firma-box .fb-fecha{font-size:7.5pt;color:#7a6f65;}
 #contratoImprimible .cp-pie{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:7pt;color:#aaa;letter-spacing:.08em;border-top:0.5pt solid #eee;padding-top:2mm;}
+/* CALENDARIO */
+.cal-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cal-nav button{padding:7px 14px;background:var(--crema-o);border:1px solid var(--borde);border-radius:4px;cursor:pointer;font-size:.9rem;}
+.cal-nav button:hover{border-color:var(--dorado);}
+.cal-mes-tit{font-family:'Cormorant Garamond',serif;font-size:1.1rem;flex:1;text-align:center;}
+.cal-anio-input{width:80px;border:1px solid var(--borde);padding:7px 8px;border-radius:4px;font-family:'Jost',sans-serif;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);text-align:center;padding:4px 0;}
+.cal-cell{min-height:76px;border:1px solid var(--borde);border-radius:5px;padding:5px 6px;font-size:.78rem;cursor:default;background:#fff;}
+.cal-cell.otro-mes{background:var(--crema-o);color:var(--gris);opacity:.6;}
+.cal-cell.hoy{border-color:var(--dorado);border-width:2px;}
+.cal-cell.con-reservas{cursor:pointer;}
+.cal-cell.con-reservas:hover{border-color:var(--dorado);}
+.cal-daynum{font-weight:500;margin-bottom:3px;}
+.cal-badge{display:block;font-size:.68rem;padding:1px 5px;border-radius:8px;background:var(--crema-o);color:var(--negro);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-badge.cancelada{opacity:.55;text-decoration:line-through;}
+.cal-mas{font-size:.68rem;color:var(--gris);}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal-box{background:#fff;border-radius:8px;padding:24px 26px;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.2);}
+.modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:14px;}
+.modal-close{float:right;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--gris);}
+.cal-lista-item{padding:10px 12px;border:1px solid var(--borde);border-radius:5px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.cal-lista-item:hover{border-color:var(--dorado);}
+.cal-detalle-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:16px;font-size:.85rem;}
+.cal-detalle-grid .campo-det .lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);}
+.cal-acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.btn-cancelar{background:#fdf0f0;color:var(--err);border:1px solid #f0c0c0;padding:9px 16px;border-radius:5px;font-size:.8rem;cursor:pointer;}
+.btn-cancelar:hover:not(:disabled){background:#fbe0e0;}
 </style>
 </head>
 <body>
@@ -158,6 +186,21 @@ table.tbl tr:hover td{background:#fbf9f5;}
         <button id="btnRecargar" type="button">Recargar</button>
       </div>
       <div id="tablaWrap"><div class="estado-vacio">Cargando contratos…</div></div>
+    </section>
+
+    <section class="card">
+      <h2>Calendario de reservas</h2>
+      <div class="filtros">
+        <div class="campo"><label>Buscar novia</label><input type="text" id="calBuscar" placeholder="Nombre…"></div>
+      </div>
+      <div class="cal-nav">
+        <button id="calPrev" type="button">‹</button>
+        <div class="cal-mes-tit" id="calMesTit"></div>
+        <button id="calNext" type="button">›</button>
+        <input type="number" id="calAnio" class="cal-anio-input">
+        <button id="calHoy" type="button">Hoy</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
     </section>
 
     <section class="card">
@@ -226,6 +269,10 @@ table.tbl tr:hover td{background:#fbf9f5;}
   </main>
 </div>
 
+<div class="modal-backdrop hidden" id="calModalBackdrop">
+  <div class="modal-box" id="calModalBox"></div>
+</div>
+
 <script>
 var API_CONTRACTS = '/api/contracts';
 var ALL_ROWS = [];
@@ -270,6 +317,7 @@ document.getElementById('btnLogin').addEventListener('click', function(){
     showDashboard();
     ALL_ROWS = j.rows || [];
     pintarContratos(ALL_ROWS);
+    renderCalendario();
     cargarPrecios();
   }).catch(function(err){
     btn.disabled = false; btn.textContent = 'Entrar';
@@ -296,6 +344,7 @@ function cargarContratos(){
     }
     ALL_ROWS = j.rows || [];
     pintarContratos(ALL_ROWS);
+    renderCalendario();
   }).catch(function(err){
     document.getElementById('tablaWrap').innerHTML = '<div class="estado-vacio">Error de conexión: '+err.message+'</div>';
   });
@@ -327,6 +376,150 @@ function parseBeautyCorner(v){
   var m = s.match(/^Hotel:\s*(.*?)\s*\|\s*Dir:\s*(.*?)(?:\s*\|\s*(.*))?$/);
   if(m) return { hotel: m[1]==='-'?'':m[1], dir: m[2]==='-'?'':m[2], notas: m[3]||'' };
   return { hotel: s };
+}
+
+// =================== CALENDARIO ===================
+// "Fecha boda"/"Hora" pueden llegar como string tal cual las escribió
+// legacyLogContract (ej. "5/12/2027", "12:00") o como objetos Date que
+// Google Sheets autoconvirtió, serializados a ISO por el doGet. Se
+// contemplan ambos casos, ancladas a Europe/Madrid explícito (no el
+// timezone de quien tenga abierto el panel).
+function parseFechaBodaParts(v){
+  if(v == null || v === '') return null;
+  var s = String(v).trim();
+  var m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if(m) return { d:+m[1], m:+m[2], y:+m[3] };
+  var dt = new Date(v);
+  if(!isNaN(dt.getTime())){
+    var f = dt.toLocaleDateString('es-ES', { timeZone:'Europe/Madrid' });
+    var m2 = f.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m2) return { d:+m2[1], m:+m2[2], y:+m2[3] };
+  }
+  return null;
+}
+function claveDia(parts){
+  return parts.y + '-' + String(parts.m).padStart(2,'0') + '-' + String(parts.d).padStart(2,'0');
+}
+function parseHoraStr(v){
+  if(v == null || v === '') return '';
+  var s = String(v).trim();
+  if(/^\d{1,2}:\d{2}/.test(s)) return s.slice(0,5);
+  var dt = new Date(v);
+  if(!isNaN(dt.getTime())) return dt.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Madrid' });
+  return s;
+}
+
+var CAL_STATE = { year: new Date().getFullYear(), month: new Date().getMonth(), buscar: '' };
+var MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function buildMonthGrid(year, monthIdx0){
+  var first = new Date(year, monthIdx0, 1);
+  var offsetLunes = (first.getDay() + 6) % 7; // Dom=0..Sab=6 -> Lun=0..Dom=6
+  var start = new Date(year, monthIdx0, 1 - offsetLunes);
+  var cells = [];
+  for(var i=0;i<42;i++){
+    var d = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+    cells.push({ y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate(), otroMes: d.getMonth()!==monthIdx0 });
+  }
+  return cells;
+}
+
+function indexarReservasPorDia(rows, filtroNombre){
+  var map = {};
+  var filtro = (filtroNombre||'').trim().toLowerCase();
+  rows.forEach(function(row){
+    if(filtro && !String(row['Nombre']||'').toLowerCase().includes(filtro)) return;
+    var parts = parseFechaBodaParts(row['Fecha boda']);
+    if(!parts) return;
+    var k = claveDia(parts);
+    (map[k] = map[k] || []).push(row);
+  });
+  return map;
+}
+
+function renderCalendario(){
+  var mapa = indexarReservasPorDia(ALL_ROWS, CAL_STATE.buscar);
+  var celdas = buildMonthGrid(CAL_STATE.year, CAL_STATE.month);
+  var hoy = new Date();
+  var hoyKey = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+
+  document.getElementById('calMesTit').textContent = MESES_ES[CAL_STATE.month] + ' ' + CAL_STATE.year;
+  document.getElementById('calAnio').value = CAL_STATE.year;
+
+  var html = ['L','M','X','J','V','S','D'].map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
+
+  celdas.forEach(function(c){
+    var key = c.y+'-'+String(c.m).padStart(2,'0')+'-'+String(c.d).padStart(2,'0');
+    var reservas = mapa[key] || [];
+    var cls = 'cal-cell' + (c.otroMes?' otro-mes':'') + (key===hoyKey?' hoy':'') + (reservas.length?' con-reservas':'');
+    var badges = reservas.slice(0,2).map(function(r){
+      var cancelada = r['Estado'] === 'Cancelada';
+      return '<span class="cal-badge'+(cancelada?' cancelada':'')+'">'+String(r['Nombre']||'—')+'</span>';
+    }).join('');
+    var mas = reservas.length > 2 ? '<span class="cal-mas">+'+(reservas.length-2)+' más</span>' : '';
+    html += '<div class="'+cls+'" data-key="'+key+'"><div class="cal-daynum">'+c.d+'</div>'+badges+mas+'</div>';
+  });
+
+  document.getElementById('calGrid').innerHTML = html;
+  window.CAL_MAPA_DIA = mapa;
+}
+
+document.getElementById('calGrid').addEventListener('click', function(e){
+  var celda = e.target.closest('.cal-cell.con-reservas');
+  if(!celda) return;
+  var reservas = window.CAL_MAPA_DIA[celda.getAttribute('data-key')] || [];
+  abrirListaDia(reservas);
+});
+document.getElementById('calPrev').addEventListener('click', function(){
+  CAL_STATE.month--; if(CAL_STATE.month<0){ CAL_STATE.month=11; CAL_STATE.year--; }
+  renderCalendario();
+});
+document.getElementById('calNext').addEventListener('click', function(){
+  CAL_STATE.month++; if(CAL_STATE.month>11){ CAL_STATE.month=0; CAL_STATE.year++; }
+  renderCalendario();
+});
+document.getElementById('calAnio').addEventListener('change', function(){
+  CAL_STATE.year = Number(this.value) || CAL_STATE.year;
+  renderCalendario();
+});
+document.getElementById('calHoy').addEventListener('click', function(){
+  var n = new Date(); CAL_STATE.year = n.getFullYear(); CAL_STATE.month = n.getMonth();
+  renderCalendario();
+});
+document.getElementById('calBuscar').addEventListener('input', function(){
+  CAL_STATE.buscar = this.value;
+  renderCalendario();
+});
+
+function cerrarModal(){ document.getElementById('calModalBackdrop').classList.add('hidden'); }
+document.getElementById('calModalBackdrop').addEventListener('click', function(e){
+  if(e.target.id === 'calModalBackdrop') cerrarModal();
+});
+
+function abrirListaDia(reservas){
+  var html = '<button class="modal-close" data-cerrar>✕</button><h3>Reservas de este día</h3>';
+  reservas.forEach(function(r, i){
+    var cancelada = r['Estado'] === 'Cancelada';
+    html += '<div class="cal-lista-item" data-idx="'+i+'"><span'+(cancelada?' style="opacity:.55;text-decoration:line-through;"':'')+'>'
+      + (r['Nombre']||'—') + ' — ' + parseHoraStr(r['Hora']) + '</span>'
+      + (cancelada ? '<span class="badge no">Cancelada</span>' : '<span class="badge si">Activa</span>') + '</div>';
+  });
+  document.getElementById('calModalBox').innerHTML = html;
+  document.getElementById('calModalBackdrop').classList.remove('hidden');
+  document.getElementById('calModalBox').querySelectorAll('.cal-lista-item').forEach(function(el){
+    el.addEventListener('click', function(){ abrirDetalle(reservas[Number(el.getAttribute('data-idx'))]); });
+  });
+  document.getElementById('calModalBox').querySelector('[data-cerrar]').addEventListener('click', cerrarModal);
+}
+
+// Detalle mínimo de solo lectura (placeholder). Se completa con el
+// resto de columnas y las acciones cancelar/editar en el bloque
+// siguiente.
+function abrirDetalle(row){
+  document.getElementById('calModalBox').innerHTML =
+    '<button class="modal-close" data-cerrar>✕</button><h3>'+(row['Nombre']||'—')+'</h3>'
+    + '<p>Fecha boda: '+(row['Fecha boda']||'—')+' · Hora: '+parseHoraStr(row['Hora'])+'</p>';
+  document.getElementById('calModalBox').querySelector('[data-cerrar]').addEventListener('click', cerrarModal);
 }
 
 var RENDERED_ROWS = [];
@@ -833,6 +1026,7 @@ function enviarContratoDesdeFila(row, btn){
     showDashboard();
     ALL_ROWS = j.rows || [];
     pintarContratos(ALL_ROWS);
+    renderCalendario();
     cargarPrecios();
   }).catch(function(){
     showLogin('Error de conexión.');
