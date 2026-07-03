@@ -31,6 +31,22 @@
  * [Token, Creado, Datos (JSON)]. Se crea sola la primera vez que se usa
  * y se borra la fila correspondiente en cuanto la novia firma (o si se
  * cancela un enlace a mano).
+ *
+ * Columna "Estado" (Fase E): añadida a Hoja 1 (columna 28). Toda
+ * reserva nueva nace "Activa"; solo cambia a "Cancelada" desde
+ * handleCancelReservation, nunca se borra la fila (trazabilidad).
+ *
+ * Notificaciones de cambio (Fase E): handleCancelReservation y
+ * handleUpdateReservation avisan a Inés por email de cualquier
+ * cancelación o cambio de fecha/hora/lugar sobre una reserva ya
+ * confirmada — esos cambios afectan también a peluquería y al resto
+ * del equipo. Requiere configurar en Apps Script (icono de engranaje
+ * "Configuración del proyecto" > "Propiedades del script"):
+ *   - RESEND_API_KEY (obligatoria para que se envíe el email; si falta,
+ *     el cambio en la hoja se hace igual, solo se omite el aviso).
+ *   - NOTIFY_EMAIL (opcional; si falta, cae a 'dyd@dydescuelasuperior.es').
+ * La API key vive aquí y NUNCA como variable de entorno de Vercel,
+ * porque el punto de escritura de estas dos acciones es este script.
  */
 
 var SHEET_CONTRATOS  = 'Hoja 1';                   // pestaña real de contratos
@@ -52,6 +68,8 @@ function doPost(e) {
     if (body.action === 'markPdfSent') return handleMarkPdfSent(body);
     if (body.action === 'savePending') return handleSavePending(body);
     if (body.action === 'deletePending') return handleDeletePending(body);
+    if (body.action === 'cancelReservation') return handleCancelReservation(body);
+    if (body.action === 'updateReservation') return handleUpdateReservation(body);
     return jsonOut({ ok: false, error: 'action no reconocida' });
   }
 
@@ -111,6 +129,11 @@ function legacyLogContract(d) {
     var colImagen = ensureColumn(sheet, 'Autoriza imagen');
     var rowId = sheet.getLastRow();
     sheet.getRange(rowId, colImagen).setValue(d.aceptaImagen ? 'Sí' : 'No');
+
+    // Estado de la reserva (Fase E). Toda reserva nueva nace "Activa";
+    // solo cambia a "Cancelada" desde handleCancelReservation.
+    var colEstado = ensureColumn(sheet, 'Estado');
+    sheet.getRange(rowId, colEstado).setValue('Activa');
 
     return jsonOut({ ok: true });
 
@@ -228,6 +251,134 @@ function handleMarkPdfSent(body) {
   sh.getRange(rowId, colEnviado).setValue('Sí');
   sh.getRange(rowId, colFecha).setValue(new Date().toISOString());
   return jsonOut({ ok: true });
+}
+
+/* ================= CANCELAR / EDITAR RESERVA (Fase E) ================= */
+
+// Cancela una reserva ya confirmada: Estado -> "Cancelada". Verificación
+// anti-condición-de-carrera idéntica a handleMarkPdfSent (compara
+// "Fecha registro" contra timestampValor antes de escribir).
+function handleCancelReservation(body) {
+  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_CONTRATOS);
+  if (!sh) return jsonOut({ ok: false, error: 'Hoja de contratos no encontrada' });
+
+  var rowId = Number(body.rowId);
+  if (!rowId || rowId < 2) return jsonOut({ ok: false, error: 'rowId inválido' });
+
+  var lastCol = sh.getLastColumn();
+  var headers = sh.getRange(1, 1, 1, lastCol).getValues()[0].map(function (h) { return String(h || '').trim(); });
+  var checkCol = headers.indexOf('Fecha registro') + 1;
+  if (checkCol > 0 && body.timestampValor) {
+    var actual = sh.getRange(rowId, checkCol).getValue();
+    if (String(actual) !== String(body.timestampValor)) {
+      return jsonOut({ ok: false, error: 'row_mismatch' });
+    }
+  }
+
+  var colNombre = headers.indexOf('Nombre') + 1;
+  var colFechaBoda = headers.indexOf('Fecha boda') + 1;
+  var nombre = colNombre > 0 ? String(sh.getRange(rowId, colNombre).getValue()) : 'clienta';
+  var fechaBoda = colFechaBoda > 0 ? String(sh.getRange(rowId, colFechaBoda).getValue()) : '';
+
+  var colEstado = ensureColumn(sh, 'Estado');
+  sh.getRange(rowId, colEstado).setValue('Cancelada');
+
+  notificarInesCambio(
+    'Cancelada: ' + nombre + ' — boda ' + fechaBoda,
+    'Se ha cancelado la reserva de ' + nombre + ' (boda ' + fechaBoda + ').'
+  );
+
+  return jsonOut({ ok: true });
+}
+
+// Edita fecha/hora/lugar de una reserva ya confirmada. El llamante debe
+// mandar los 3 valores nuevos siempre (aunque solo cambie uno). Estas 3
+// columnas ya existen desde el origen (posición fija), así que se
+// localizan con indexOf sobre las cabeceras, NO con ensureColumn.
+function handleUpdateReservation(body) {
+  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_CONTRATOS);
+  if (!sh) return jsonOut({ ok: false, error: 'Hoja de contratos no encontrada' });
+
+  var rowId = Number(body.rowId);
+  if (!rowId || rowId < 2) return jsonOut({ ok: false, error: 'rowId inválido' });
+
+  var lastCol = sh.getLastColumn();
+  var headers = sh.getRange(1, 1, 1, lastCol).getValues()[0].map(function (h) { return String(h || '').trim(); });
+  var checkCol = headers.indexOf('Fecha registro') + 1;
+  if (checkCol > 0 && body.timestampValor) {
+    var actual = sh.getRange(rowId, checkCol).getValue();
+    if (String(actual) !== String(body.timestampValor)) {
+      return jsonOut({ ok: false, error: 'row_mismatch' });
+    }
+  }
+
+  var colNombre = headers.indexOf('Nombre') + 1;
+  var colFecha = headers.indexOf('Fecha boda') + 1;
+  var colHora = headers.indexOf('Hora') + 1;
+  var colLugar = headers.indexOf('Lugar evento') + 1;
+  if (!colFecha || !colHora || !colLugar) {
+    return jsonOut({ ok: false, error: 'No se encontraron las columnas Fecha boda/Hora/Lugar evento' });
+  }
+
+  var nombre = colNombre > 0 ? String(sh.getRange(rowId, colNombre).getValue()) : 'clienta';
+  var fechaAntes = String(sh.getRange(rowId, colFecha).getValue());
+  var horaAntes = String(sh.getRange(rowId, colHora).getValue());
+  var lugarAntes = String(sh.getRange(rowId, colLugar).getValue());
+
+  var fechaDespues = body.fechaBodaFmt || body.fechaBoda || '';
+  var horaDespues = body.hora || '';
+  var lugarDespues = body.lugarEvento || '';
+
+  sh.getRange(rowId, colFecha).setValue(fechaDespues);
+  sh.getRange(rowId, colHora).setValue(horaDespues);
+  sh.getRange(rowId, colLugar).setValue(lugarDespues);
+
+  var antes = fechaAntes + ' ' + horaAntes + (lugarAntes ? ' — ' + lugarAntes : '');
+  var despues = fechaDespues + ' ' + horaDespues + (lugarDespues ? ' — ' + lugarDespues : '');
+
+  notificarInesCambio(
+    'Cambio de fecha: ' + nombre + ' — ' + fechaAntes + ' → ' + fechaDespues,
+    'Se ha modificado la reserva de ' + nombre + '.\nAntes: ' + antes + '\nAhora: ' + despues
+  );
+
+  return jsonOut({ ok: true });
+}
+
+// Notificación best-effort a Inés para cambios que hoy no avisan a
+// nadie (cancelación, edición de fecha/hora/lugar). Nunca lanza
+// excepción: si Resend falla o no hay API key configurada, el cambio
+// en la hoja ya se hizo igualmente (mismo criterio que
+// api/complete-signing.js en Vercel). La API key vive en Script
+// Properties, NUNCA hardcodeada: Apps Script no tiene acceso a las
+// variables de entorno de Vercel.
+function notificarInesCambio(asunto, cuerpoTexto) {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var apiKey = props.getProperty('RESEND_API_KEY');
+    if (!apiKey) {
+      Logger.log('notificarInesCambio: RESEND_API_KEY no configurada en Script Properties, se omite el email. Asunto: ' + asunto);
+      return;
+    }
+    var dest = props.getProperty('NOTIFY_EMAIL') || 'dyd@dydescuelasuperior.es';
+    var html = '<p>' + String(cuerpoTexto).replace(/\n/g, '<br>') + '</p>';
+    var resp = UrlFetchApp.fetch('https://api.resend.com/emails', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + apiKey },
+      muteHttpExceptions: true,
+      payload: JSON.stringify({
+        from: 'Inés Sánchez Beauty Concept <novias@dydescuelasuperior.es>',
+        to: [dest],
+        subject: asunto,
+        html: html
+      })
+    });
+    if (resp.getResponseCode() >= 300) {
+      Logger.log('notificarInesCambio: Resend respondió ' + resp.getResponseCode() + ' — ' + resp.getContentText());
+    }
+  } catch (err) {
+    Logger.log('notificarInesCambio error (no bloqueante): ' + err.message);
+  }
 }
 
 /* ================= PENDIENTES DE FIRMA (Fase D) ================= */
